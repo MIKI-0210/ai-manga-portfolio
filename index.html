@@ -147,24 +147,20 @@ section{padding:6rem 3rem}
 /* fix[W]: インラインスタイルをクラスに統一 */
 .reveal-delay-4{transition-delay:.4s}
 
-/* ===== 4KOMA SCROLL ===== */
-#koma{background:var(--ink);overflow:hidden}
-#koma .section-label{color:rgba(255,255,255,.4)}
-#koma .section-label::before{background:rgba(255,255,255,.4)}
-#koma .section-title{color:var(--white)}
-.koma-track-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;user-select:none;margin-top:2.5rem;padding:0 3rem 2rem}
-.koma-track-wrap::-webkit-scrollbar{display:none}
-.koma-track-wrap.dragging{cursor:grabbing}
-.koma-track{display:flex;gap:1.5rem;width:max-content}
-.koma-ep{flex:0 0 auto;width:min(60vw,340px);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:transform .28s,box-shadow .28s}
-.koma-ep:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.koma-ep-thumb{width:100%;aspect-ratio:1/1;overflow:hidden;position:relative}
+/* ===== STORIES ===== */
+#koma{background:var(--white)}
+.koma-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+.koma-ep{border-radius:16px;overflow:hidden;background:var(--white);border:1px solid var(--border);cursor:pointer;transition:transform .28s,box-shadow .28s}
+.koma-ep:hover{transform:translateY(-8px);box-shadow:0 24px 64px rgba(0,0,0,.1)}
+.koma-ep-thumb{width:100%;aspect-ratio:3/4;overflow:hidden;position:relative}
 .koma-ep-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
 .koma-ep:hover .koma-ep-thumb img{transform:scale(1.06)}
-.koma-ep-body{padding:1.2rem 1.4rem}
-.koma-ep-label{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.4rem}
-.koma-ep-title{font-family:var(--font-display);font-size:1.6rem;letter-spacing:.06em;color:var(--white);line-height:1.1}
-.koma-ep-count{font-size:.78rem;color:rgba(255,255,255,.35);margin-top:.4rem}
+.koma-ep-num{position:absolute;top:1rem;left:1rem;font-family:var(--font-display);font-size:3.5rem;line-height:1;color:rgba(255,255,255,.9);text-shadow:0 2px 12px rgba(0,0,0,.3)}
+.koma-ep-body{padding:1.2rem 1.4rem 1.5rem}
+.koma-ep-label{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.koma-ep-title{font-family:var(--font-display);font-size:1.8rem;letter-spacing:.06em;color:var(--ink);line-height:1.1}
+.koma-ep-count{font-size:.78rem;color:var(--muted);margin-top:.4rem}
+@media(max-width:900px){.koma-grid{grid-template-columns:repeat(2,1fr)}}
 
 /* ===== STATS ===== */
 .stats-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:4rem}
@@ -416,14 +412,12 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   </div>
 </section>
 
-<!-- 4コマ横スクロール -->
+<!-- ストーリー一覧 -->
 <section id="koma" aria-labelledby="koma-heading">
   <div class="container">
-    <p class="section-label reveal">4-Panel Manga</p>
+    <p class="section-label reveal">Stories</p>
     <h2 class="section-title reveal" id="koma-heading">4コマ漫画</h2>
-  </div>
-  <div class="koma-track-wrap reveal">
-    <div class="koma-track" id="koma-track">
+    <div class="koma-grid" id="koma-track">
       <!-- JS で生成 -->
     </div>
   </div>
@@ -555,6 +549,12 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
       img.loading = 'lazy';
       thumb.appendChild(img);
 
+      // 話数を画像上にオーバーレイ
+      const numEl = document.createElement('span');
+      numEl.className = 'koma-ep-num';
+      numEl.textContent = String(epNum).padStart(2, '0');
+      thumb.appendChild(numEl);
+
       const body = document.createElement('div');
       body.className = 'koma-ep-body';
       body.innerHTML = `
@@ -593,20 +593,6 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
       komaTrack.appendChild(card);
     });
 
-    // ドラッグスクロール
-    const wrap = komaTrack.parentElement;
-    let isDown = false, startX, scrollLeft, moved = false;
-    wrap.addEventListener('mousedown', e => { isDown = true; moved = false; wrap.classList.add('dragging'); startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft; });
-    wrap.addEventListener('mouseleave', () => { isDown = false; wrap.classList.remove('dragging'); });
-    wrap.addEventListener('mouseup', () => { isDown = false; wrap.classList.remove('dragging'); });
-    wrap.addEventListener('mousemove', e => {
-      if (!isDown) return;
-      const dx = e.pageX - wrap.offsetLeft - startX;
-      if (Math.abs(dx) > 5) moved = true;
-      wrap.scrollLeft = scrollLeft - dx;
-    });
-    // ドラッグ中はクリックを無効化
-    wrap.addEventListener('click', e => { if (moved) { e.stopPropagation(); moved = false; } }, true);
   }
 
   // fix[S]: observer.unobserve() でメモリ解放
