@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>画像仕分けツール</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1a1a;--muted:#888;--border:#e0e0e0;--bg:#f0f0f0;
+  --white:#fff;--accent:#f4a7b9;--sel:#3b82f6;
+}
+body{font-family:'Noto Sans JP','Helvetica Neue',sans-serif;background:var(--bg);color:var(--ink);font-size:13px}
+
+/* ===== HEADER ===== */
+header{background:var(--ink);color:#fff;padding:.65rem 1.2rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:200;flex-wrap:wrap}
+header h1{font-size:.85rem;font-weight:500;white-space:nowrap;margin-right:auto}
+.btn{border:none;padding:.38rem .9rem;border-radius:100px;font-size:.72rem;cursor:pointer;font-weight:600;white-space:nowrap;transition:opacity .15s}
+.btn:hover{opacity:.8}
+.btn-export{background:var(--accent);color:var(--ink)}
+.btn-reset{background:rgba(255,255,255,.15);color:#fff}
+#status{font-size:.7rem;color:rgba(255,255,255,.45)}
+
+/* ===== ASSIGN BAR (sticky) ===== */
+.assign-bar{background:#fff;border-bottom:2px solid var(--border);padding:.5rem 1.2rem;display:flex;align-items:center;gap:.4rem;position:sticky;top:40px;z-index:190;flex-wrap:wrap}
+.assign-bar-label{font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-right:.25rem;white-space:nowrap}
+.assign-btn{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:var(--ink);font-size:.78rem;font-weight:700;cursor:pointer;transition:background .12s,border-color .12s,color .12s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.assign-btn:hover{border-color:var(--ink);background:#f5f5f5}
+.assign-btn.has-sel{background:var(--sel);border-color:var(--sel);color:#fff}
+.assign-hint{font-size:.68rem;color:var(--muted);margin-left:.5rem}
+#sel-count{font-size:.72rem;font-weight:700;color:var(--sel);min-width:60px}
+
+/* ===== POOL ===== */
+.pool-wrap{padding:.75rem 1.2rem;background:var(--white);border-bottom:1px solid var(--border)}
+.pool-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;flex-wrap:wrap}
+.pool-hdr h2{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.badge{font-size:.65rem;background:var(--bg);border-radius:100px;padding:.12rem .55rem;color:var(--muted)}
+.pool-search{border:1px solid var(--border);border-radius:100px;padding:.22rem .7rem;font-size:.72rem;outline:none;width:160px}
+.pool-search:focus{border-color:var(--sel)}
+.pool{display:flex;flex-wrap:wrap;gap:.45rem;min-height:52px}
+
+/* ===== STORIES ===== */
+.stories-wrap{padding:.75rem 1.2rem;overflow-x:auto}
+.stories{display:flex;gap:.65rem;min-width:max-content;align-items:flex-start;padding-bottom:1rem}
+.story{width:148px;flex-shrink:0}
+.story-hdr{background:var(--ink);color:#fff;border-radius:8px 8px 0 0;padding:.4rem .65rem;display:flex;align-items:center;justify-content:space-between}
+.story-num{font-size:.95rem;font-weight:700;flex-shrink:0}
+.story-meta{font-size:.6rem;color:rgba(255,255,255,.4)}
+.story-clr{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.8rem;padding:0;line-height:1;flex-shrink:0}
+.story-clr:hover{color:#fff}
+.story-title-input{width:100%;background:rgba(255,255,255,.1);border:none;border-bottom:1px solid rgba(255,255,255,.2);color:#fff;font-size:.7rem;padding:.2rem .35rem;outline:none;border-radius:0;font-family:inherit;transition:background .15s}
+.story-title-input::placeholder{color:rgba(255,255,255,.3)}
+.story-title-input:focus{background:rgba(255,255,255,.18);border-bottom-color:var(--accent)}
+.slot{min-height:340px;background:#fafafa;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:.35rem;display:flex;flex-direction:column;gap:.3rem;transition:background .12s}
+.slot.drag-over{background:#fff0f4;border-color:var(--accent)}
+.slot-hint{color:#ccc;font-size:.65rem;text-align:center;padding:1.2rem 0;pointer-events:none}
+
+/* ===== CARD ===== */
+.card{background:var(--white);border:2px solid var(--border);border-radius:7px;overflow:hidden;cursor:pointer;transition:transform .1s,box-shadow .1s,border-color .1s;user-select:none;position:relative}
+.card:hover{box-shadow:0 3px 10px rgba(0,0,0,.12);transform:translateY(-1px)}
+.card.selected{border-color:var(--sel);box-shadow:0 0 0 2px rgba(59,130,246,.3)}
+.card.selected::after{content:'✓';position:absolute;top:3px;right:3px;background:var(--sel);color:#fff;font-size:.6rem;font-weight:700;border-radius:4px;padding:.1rem .3rem;line-height:1.4}
+.card.dragging{opacity:.3}
+/* pool cards */
+.pool .card{width:100px}
+.pool .card .card-img{height:96px}
+/* slot cards — draggable for reorder */
+.slot .card{width:136px;cursor:grab}
+.slot .card:active{cursor:grabbing}
+.slot .card .card-img{height:116px}
+.card-img{overflow:hidden;background:#eee}
+.card-img img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.card-name{padding:.22rem .38rem;font-size:.56rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:1px solid var(--border)}
+.card-order{position:absolute;top:3px;left:3px;background:var(--ink);color:#fff;font-size:.58rem;font-weight:700;border-radius:4px;padding:.08rem .28rem;line-height:1.4}
+.drop-marker{height:3px;background:var(--accent);border-radius:2px;margin:.1rem 0;pointer-events:none}
+
+/* ===== MODAL ===== */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center}
+.modal.open{display:flex}
+.modal-inner{background:#fff;border-radius:12px;padding:1.4rem;max-width:540px;width:92%;max-height:80vh;display:flex;flex-direction:column;gap:.75rem}
+.modal-inner h3{font-size:.85rem}
+.modal-inner pre{font-size:.68rem;background:#f5f5f5;border-radius:6px;padding:.85rem;overflow:auto;white-space:pre-wrap;flex:1;max-height:55vh}
+.modal-close{align-self:flex-end;background:none;border:1px solid var(--border);border-radius:100px;padding:.3rem .9rem;cursor:pointer;font-size:.75rem}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🗂 画像仕分けツール</h1>
+  <span id="status">未整理: 0枚</span>
+  <button class="btn btn-reset" onclick="resetAll()">リセット</button>
+  <button class="btn btn-export" onclick="exportResult()">📋 結果コピー</button>
+</header>
+
+<!-- Assign bar: always visible -->
+<div class="assign-bar">
+  <span class="assign-bar-label">話に入れる</span>
+  <div id="assign-btns"></div>
+  <span id="sel-count"></span>
+  <span class="assign-hint">← 画像をクリックで選択、ここの番号で割り当て　|　キー1〜0でも可</span>
+</div>
+
+<!-- Pool -->
+<div class="pool-wrap">
+  <div class="pool-hdr">
+    <h2>未整理の画像</h2>
+    <span class="badge" id="pool-count">0</span>
+    <input class="pool-search" id="search" type="text" placeholder="ファイル名で絞り込み…" oninput="render()">
+  </div>
+  <div class="pool" id="pool"></div>
+</div>
+
+<!-- Stories -->
+<div class="stories-wrap">
+  <div class="stories" id="stories"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-inner">
+    <h3>仕分け結果</h3>
+    <pre id="result-pre"></pre>
+    <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">閉じる</button>
+  </div>
+</div>
+
+<script>
+const ALL_IMAGES = [
+  {src:'images/kindle1/001.jpg', name:'001.jpg'},
+  {src:'images/kindle1/002.jpg', name:'002.jpg'},
+  {src:'images/kindle1/003.jpg', name:'003.jpg'},
+  {src:'images/kindle1/004.jpg', name:'004.jpg'},
+  {src:'images/kindle1/005.jpg', name:'005.jpg'},
+  {src:'images/kindle1/009.jpg', name:'009.jpg'},
+  {src:'images/kindle1/1-1.jpg', name:'1-1.jpg'},
+  {src:'images/kindle1/1-2.jpg', name:'1-2.jpg'},
+  {src:'images/kindle1/1-3.jpg', name:'1-3.jpg'},
+  {src:'images/kindle1/1-4.jpg', name:'1-4.jpg'},
+  {src:'images/kindle1/1-5.jpg', name:'1-5.jpg'},
+  {src:'images/kindle1/1-6.jpg', name:'1-6.jpg'},
+  {src:'images/kindle1/1-7.jpg', name:'1-7.jpg'},
+  {src:'images/kindle1/1-8.jpg', name:'1-8.jpg'},
+  {src:'images/kindle1/1-9.jpg', name:'1-9.jpg'},
+  {src:'images/kindle1/1-10.jpg', name:'1-10.jpg'},
+  {src:'images/kindle1/9-1.jpg', name:'9-1.jpg'},
+  {src:'images/kindle1/9-2.jpg', name:'9-2.jpg'},
+  {src:'images/kindle1/9-3.jpg', name:'9-3.jpg'},
+  {src:'images/kindle1/9-4.jpg', name:'9-4.jpg'},
+  {src:'images/kindle1/9-5.jpg', name:'9-5.jpg'},
+  {src:'images/kindle1/9-6.jpg', name:'9-6.jpg'},
+  {src:'images/kindle1/9-7.jpg', name:'9-7.jpg'},
+  {src:'images/kindle1/9-8.jpg', name:'9-8.jpg'},
+  {src:'images/kindle1/9-9.jpg', name:'9-9.jpg'},
+  {src:'images/kindle1/9-10.jpg', name:'9-10.jpg'},
+  {src:'images/kindle1/10-1.jpg', name:'10-1.jpg'},
+  {src:'images/kindle1/10-2.jpg', name:'10-2.jpg'},
+  {src:'images/kindle1/10-3.jpg', name:'10-3.jpg'},
+  {src:'images/kindle1/10-4.jpg', name:'10-4.jpg'},
+  {src:'images/kindle1/10-5.jpg', name:'10-5.jpg'},
+  {src:'images/kindle1/10-6.jpg', name:'10-6.jpg'},
+  {src:'images/kindle1/10-7.jpg', name:'10-7.jpg'},
+  {src:'images/kindle1/10-8.jpg', name:'10-8.jpg'},
+  {src:'images/kindle1/10-9.jpg', name:'10-9.jpg'},
+  {src:'images/kindle1/10-10.jpg', name:'10-10.jpg'},
+  {src:'images/kindle1/オラフの真似.jpg', name:'オラフの真似.jpg'},
+  {src:'images/kindle1/滑り台.jpg', name:'滑り台.jpg'},
+  {src:'images/kindle1/雪だるま.jpg', name:'雪だるま.jpg'},
+  {src:'images/kindle1/雪遊び１.jpg', name:'雪遊び１.jpg'},
+  {src:'images/kindle1/雪遊び２.jpg', name:'雪遊び２.jpg'},
+  {src:'images/kindle2/006.jpg', name:'006.jpg'},
+  {src:'images/kindle2/007.jpg', name:'007.jpg'},
+  {src:'images/kindle2/008.jpg', name:'008.jpg'},
+  {src:'images/kindle2/010.jpg', name:'010.jpg'},
+  {src:'images/kindle2/新節分１.jpg', name:'新節分１.jpg'},
+  {src:'images/kindle2/新節分２.jpg', name:'新節分２.jpg'},
+  {src:'images/kindle2/新節分３.jpg', name:'新節分３.jpg'},
+  {src:'images/kindle2/新節分４.jpg', name:'新節分４.jpg'},
+  {src:'images/kindle2/新節分５.jpg', name:'新節分５.jpg'},
+  {src:'images/kindle2/新節分６.jpg', name:'新節分６.jpg'},
+  {src:'images/kindle2/新節分７.jpg', name:'新節分７.jpg'},
+  {src:'images/kindle2/新節分８.jpg', name:'新節分８.jpg'},
+  {src:'images/kindle2/新節分９.jpg', name:'新節分９.jpg'},
+  {src:'images/kindle2/新節分10.jpg', name:'新節分10.jpg'},
+  {src:'images/kindle2/節分.jpg', name:'節分.jpg'},
+  {src:'images/kindle2/節分２.jpg', name:'節分２.jpg'},
+  {src:'images/kindle2/節分３.jpg', name:'節分３.jpg'},
+  {src:'images/kindle2/節分４.jpg', name:'節分４.jpg'},
+  {src:'images/kindle2/節分の後.jpg', name:'節分の後.jpg'},
+  {src:'images/kindle2/節分の後２.jpg', name:'節分の後２.jpg'},
+  {src:'images/kindle2/節分の後３.jpg', name:'節分の後３.jpg'},
+  {src:'images/kindle2/節分の後４.jpg', name:'節分の後４.jpg'},
+  {src:'images/kindle2/節分の後５.jpg', name:'節分の後５.jpg'},
+  {src:'images/kindle2/節分の後６.jpg', name:'節分の後６.jpg'},
+  {src:'images/kindle2/思い出　節分.jpg', name:'思い出　節分.jpg'},
+  {src:'images/kindle2/バレンタイン.jpg', name:'バレンタイン.jpg'},
+  {src:'images/kindle2/ハッピーバレンタイン.jpg', name:'ハッピーバレンタイン.jpg'},
+  {src:'images/kindle2/チョコレート.jpg', name:'チョコレート.jpg'},
+  {src:'images/kindle2/チョコレート２.jpg', name:'チョコレート２.jpg'},
+  {src:'images/kindle2/チョコレート３.jpg', name:'チョコレート３.jpg'},
+  {src:'images/kindle2/チョコレート４.jpg', name:'チョコレート４.jpg'},
+  {src:'images/kindle2/チョコレート５.jpg', name:'チョコレート５.jpg'},
+  {src:'images/kindle2/チョコレート６.jpg', name:'チョコレート６.jpg'},
+  {src:'images/kindle2/チョコレート７.jpg', name:'チョコレート７.jpg'},
+  {src:'images/kindle2/チョコレート８.jpg', name:'チョコレート８.jpg'},
+  {src:'images/kindle2/チョコレート９.jpg', name:'チョコレート９.jpg'},
+  {src:'images/kindle2/チョコレート１０.jpg', name:'チョコレート１０.jpg'},
+  {src:'images/kindle2/プレゼント.jpg', name:'プレゼント.jpg'},
+  {src:'images/kindle2/ホワイトデー.jpg', name:'ホワイトデー.jpg'},
+  {src:'images/kindle2/チラシ寿司.jpg', name:'チラシ寿司.jpg'},
+  {src:'images/kindle2/チラシ寿司２.jpg', name:'チラシ寿司２.jpg'},
+  {src:'images/kindle2/パーティ.jpg', name:'パーティ.jpg'},
+  {src:'images/kindle2/パーティーの準備.jpg', name:'パーティーの準備.jpg'},
+  {src:'images/kindle2/もうすぐ誕生日.jpg', name:'もうすぐ誕生日.jpg'},
+  {src:'images/kindle2/もうすぐ誕生日２.jpg', name:'もうすぐ誕生日２.jpg'},
+  {src:'images/kindle2/誕生日.jpg', name:'誕生日.jpg'},
+  {src:'images/kindle2/誕生日２.jpg', name:'誕生日２.jpg'},
+  {src:'images/kindle2/誕生日３.jpg', name:'誕生日３.jpg'},
+  {src:'images/kindle2/誕生日４.jpg', name:'誕生日４.jpg'},
+  {src:'images/kindle2/誕生日５.jpg', name:'誕生日５.jpg'},
+  {src:'images/kindle2/誕生日プレゼント２.jpg', name:'誕生日プレゼント２.jpg'},
+  {src:'images/kindle2/もうすぐ猫の日.jpg', name:'もうすぐ猫の日.jpg'},
+  {src:'images/kindle2/もうすぐ猫の日２.jpg', name:'もうすぐ猫の日２.jpg'},
+  {src:'images/kindle2/もうすぐ猫の日３.jpg', name:'もうすぐ猫の日３.jpg'},
+  {src:'images/kindle2/もうすぐ猫の日４.jpg', name:'もうすぐ猫の日４.jpg'},
+  {src:'images/kindle2/もうすぐ猫の日５.jpg', name:'もうすぐ猫の日５.jpg'},
+  {src:'images/kindle2/もうすぐ猫の日６.jpg', name:'もうすぐ猫の日６.jpg'},
+  {src:'images/kindle2/もうすぐ猫の日７.jpg', name:'もうすぐ猫の日７.jpg'},
+  {src:'images/kindle2/虫の日.jpg', name:'虫の日.jpg'},
+  {src:'images/kindle2/虫の日２.jpg', name:'虫の日２.jpg'},
+  ...Array.from({length:21}, (_,i) => ({src:`images/sakura/${i+1}.png`, name:`sakura-${i+1}.png`})),
+];
+
+// STATE — localStorageで永続化
+const SAVE_KEY = 'sort-tool-v1';
+const stories = {};
+const titles = {};
+for (let i = 1; i <= 10; i++) { stories[i] = []; titles[i] = ''; }
+
+function saveState(){
+  const data = {};
+  for(let i=1;i<=10;i++) data[i] = { pages: stories[i], title: titles[i] };
+  localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+}
+function loadState(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    for(let i=1;i<=10;i++){
+      if(data[i]){ stories[i] = data[i].pages||[]; titles[i] = data[i].title||''; }
+    }
+  } catch(e){}
+}
+loadState();
+const selected = new Set(); // selected src strings
+
+// ===== SELECTION =====
+function toggleSelect(src){
+  if (selected.has(src)) selected.delete(src);
+  else selected.add(src);
+  updateAssignBar();
+  // update just the card border without full re-render
+  document.querySelectorAll(`.pool .card`).forEach(c => {
+    c.classList.toggle('selected', selected.has(c.dataset.src));
+  });
+}
+
+function clearSelection(){ selected.clear(); updateAssignBar(); }
+
+function assignTo(storyIdx){
+  if (selected.size === 0) return;
+  selected.forEach(src => {
+    // remove from any existing story
+    for (let i = 1; i <= 10; i++) stories[i] = stories[i].filter(s => s !== src);
+    if (!stories[storyIdx].includes(src)) stories[storyIdx].push(src);
+  });
+  saveState();
+  clearSelection();
+  render();
+}
+
+function updateAssignBar(){
+  const n = selected.size;
+  document.getElementById('sel-count').textContent = n > 0 ? `${n}枚選択中` : '';
+  document.querySelectorAll('.assign-btn').forEach(b => b.classList.toggle('has-sel', n > 0));
+}
+
+// ===== BUILD ASSIGN BAR =====
+function buildAssignBar(){
+  const wrap = document.getElementById('assign-btns');
+  wrap.innerHTML = '';
+  wrap.style.cssText = 'display:flex;gap:.3rem;flex-wrap:wrap';
+  for (let i = 1; i <= 10; i++){
+    const b = document.createElement('button');
+    b.className = 'assign-btn';
+    b.textContent = i;
+    b.title = `話${i}に入れる（キー: ${i === 10 ? '0' : i}）`;
+    b.addEventListener('click', () => assignTo(i));
+    wrap.appendChild(b);
+  }
+}
+
+// キーボード 1〜0 で話1〜10に割り当て
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const n = e.key === '0' ? 10 : parseInt(e.key);
+  if (n >= 1 && n <= 10 && selected.size > 0){ e.preventDefault(); assignTo(n); }
+  if (e.key === 'Escape') clearSelection();
+});
+
+// ===== POOL =====
+function buildPool(){
+  const pool = document.getElementById('pool');
+  pool.innerHTML = '';
+  const q = (document.getElementById('search')?.value || '').toLowerCase();
+  const unassigned = ALL_IMAGES.filter(x => !isAssigned(x.src) && x.name.toLowerCase().includes(q));
+  unassigned.forEach(img => {
+    const card = makeCard(img, 'pool');
+    card.addEventListener('click', () => toggleSelect(img.src));
+    pool.appendChild(card);
+  });
+  document.getElementById('pool-count').textContent = unassigned.length;
+}
+
+function isAssigned(src){ return Object.values(stories).some(a => a.includes(src)); }
+
+// ===== STORIES =====
+function buildStories(){
+  const wrap = document.getElementById('stories');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= 10; i++){
+    const col = document.createElement('div');
+    col.className = 'story';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'story-hdr';
+    hdr.style.flexDirection = 'column';
+    hdr.style.gap = '.25rem';
+    const hdrTop = document.createElement('div');
+    hdrTop.style.cssText = 'display:flex;align-items:center;justify-content:space-between;width:100%';
+    hdrTop.innerHTML = `<span class="story-num">話 ${i}</span><span class="story-meta">${stories[i].length}枚</span><button class="story-clr" onclick="clearStory(${i})">✕</button>`;
+    const titleInput = document.createElement('input');
+    titleInput.className = 'story-title-input';
+    titleInput.type = 'text';
+    titleInput.placeholder = 'タイトルを入力…';
+    titleInput.value = titles[i];
+    titleInput.addEventListener('input', e => { titles[i] = e.target.value; saveState(); });
+    hdr.append(hdrTop, titleInput);
+
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    slot.dataset.story = i;
+
+    if (stories[i].length === 0){
+      slot.innerHTML = '<div class="slot-hint">ここにドロップ<br>または上の番号を押す</div>';
+    } else {
+      stories[i].forEach(src => {
+        const img = ALL_IMAGES.find(x => x.src === src);
+        if (!img) return;
+        const card = makeCard(img, i);
+        // drag to reorder within slot
+        card.draggable = true;
+        card.addEventListener('dragstart', e => { dragSrc = src; dragFrom = i; card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+        // click in slot → remove back to pool
+        card.addEventListener('click', () => { stories[i] = stories[i].filter(s => s !== src); saveState(); render(); });
+        card.title = 'クリックでプールに戻す';
+        slot.appendChild(card);
+      });
+    }
+
+    // drop for reorder
+    let dragSrc = null, dragFrom = null;
+    slot.addEventListener('dragover', e => {
+      e.preventDefault(); slot.classList.add('drag-over');
+      const after = getAfter(slot, e.clientY);
+      slot.querySelector('.drop-marker')?.remove();
+      const m = Object.assign(document.createElement('div'), {className:'drop-marker'});
+      after ? slot.insertBefore(m, after) : slot.appendChild(m);
+    });
+    slot.addEventListener('dragleave', () => { slot.classList.remove('drag-over'); slot.querySelector('.drop-marker')?.remove(); });
+    slot.addEventListener('drop', e => {
+      e.preventDefault(); slot.classList.remove('drag-over'); slot.querySelector('.drop-marker')?.remove();
+      if (!dragSrc) return;
+      const after = getAfter(slot, e.clientY);
+      const cards = [...slot.querySelectorAll('.card:not(.dragging)')];
+      const pos = after ? cards.indexOf(after) : stories[i].length;
+      stories[i] = stories[i].filter(s => s !== dragSrc);
+      stories[i].splice(Math.max(0, pos), 0, dragSrc);
+      dragSrc = null; saveState(); render();
+    });
+
+    col.append(hdr, slot);
+    wrap.appendChild(col);
+  }
+}
+
+function getAfter(container, y){
+  const cards = [...container.querySelectorAll('.card:not(.dragging)')];
+  return cards.reduce((best, c) => {
+    const box = c.getBoundingClientRect();
+    const off = y - box.top - box.height / 2;
+    return off < 0 && off > best.offset ? {offset: off, element: c} : best;
+  }, {offset: -Infinity}).element;
+}
+
+// ===== CARD =====
+function makeCard(img, from){
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.src = img.src;
+  if (typeof from === 'pool' && selected.has(img.src)) card.classList.add('selected');
+
+  const imgWrap = Object.assign(document.createElement('div'), {className:'card-img'});
+  const imgEl = Object.assign(document.createElement('img'), {src:img.src, alt:img.name, loading:'lazy'});
+  imgWrap.appendChild(imgEl);
+
+  const nameEl = Object.assign(document.createElement('div'), {className:'card-name', title:img.name, textContent:img.name});
+  card.append(imgWrap, nameEl);
+
+  if (typeof from === 'number'){
+    const order = Object.assign(document.createElement('span'), {className:'card-order', textContent: stories[from].indexOf(img.src) + 1});
+    card.appendChild(order);
+    if (selected.has(img.src)) card.classList.add('selected');
+  }
+  return card;
+}
+
+function clearStory(i){ stories[i] = []; saveState(); clearSelection(); render(); }
+function resetAll(){ if(!confirm('全リセット？')) return; for(let i=1;i<=10;i++){ stories[i]=[]; titles[i]=''; } saveState(); clearSelection(); render(); }
+
+// ===== RENDER =====
+function render(){
+  buildPool();
+  buildStories();
+  updateAssignBar();
+  const n = ALL_IMAGES.filter(x => !isAssigned(x.src)).length;
+  document.getElementById('status').textContent = `未整理: ${n}枚`;
+}
+
+// ===== EXPORT =====
+function exportResult(){
+  const out = {};
+  for(let i=1;i<=10;i++) if(stories[i].length) out[`話${i}`] = { title: titles[i] || '', pages: stories[i].map(s => ALL_IMAGES.find(x=>x.src===s)?.name||s) };
+  const un = ALL_IMAGES.filter(x=>!isAssigned(x.src)).map(x=>x.name);
+  if(un.length) out['未整理'] = un;
+  const json = JSON.stringify(out, null, 2);
+  navigator.clipboard.writeText(json).then(()=>alert('コピーしました ✓')).catch(()=>{
+    document.getElementById('result-pre').textContent = json;
+    document.getElementById('modal').classList.add('open');
+  });
+}
+
+// INIT
+buildAssignBar();
+render();
+</script>
+</body>
+</html>

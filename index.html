@@ -24,7 +24,7 @@
   --font-body:'Noto Sans JP',sans-serif;
 }
 html{scroll-behavior:smooth}
-body{font-family:var(--font-body);color:var(--ink);background:var(--white);overflow-x:hidden}
+body{font-family:var(--font-body);color:var(--ink);background:var(--accent-lt);overflow-x:hidden}
 img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 
@@ -43,6 +43,18 @@ a{color:inherit;text-decoration:none}
 @keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-18px) rotate(8deg)}}
 .deco:nth-child(2n){animation-duration:8s;animation-delay:-2s}
 .deco:nth-child(3n){animation-duration:7s;animation-delay:-4s}
+
+/* ===== PAGE-WIDE FLOATING DECO ===== */
+.page-deco{position:fixed;inset:0;pointer-events:none;user-select:none;z-index:0;overflow:hidden}
+.page-deco span{position:absolute;font-size:1.4rem;opacity:.18;animation:float 7s ease-in-out infinite}
+.page-deco span:nth-child(2n){animation-duration:9s;animation-delay:-3s}
+.page-deco span:nth-child(3n){animation-duration:6s;animation-delay:-5s}
+.page-deco span:nth-child(4n){animation-duration:11s;animation-delay:-1.5s}
+.page-deco span:nth-child(5n){animation-duration:8s;animation-delay:-7s}
+
+/* ===== HERO BG IMAGE ===== */
+.hero-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:.07;pointer-events:none;z-index:1;filter:saturate(0)}
+.hero-content{position:relative;z-index:2}
 
 /* ===== NAV ===== */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
@@ -111,7 +123,7 @@ section{padding:6rem 3rem}
 .filter-btn{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem 1.4rem;border-radius:100px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .filter-btn:hover{border-color:var(--ink);color:var(--ink)}
 .filter-btn.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
-.works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:1.5rem}
+.works-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-top:1.5rem}
 .work-card.hidden{display:none}
 .work-card{border-radius:16px;overflow:hidden;background:var(--white);border:1px solid var(--border);cursor:pointer;transition:transform .28s,box-shadow .28s;position:relative}
 .work-card:hover{transform:translateY(-8px);box-shadow:0 24px 64px rgba(0,0,0,.1)}
@@ -122,6 +134,7 @@ section{padding:6rem 3rem}
 .work-card:hover .work-thumb img{transform:scale(1.06)}
 .work-badge{position:absolute;top:1rem;right:1rem;background:var(--ink);color:var(--white);font-size:.68rem;letter-spacing:.1em;padding:.3rem .9rem;border-radius:100px;text-transform:uppercase}
 .work-body{padding:1.5rem}
+.work-title-text{font-size:.92rem;font-weight:600;color:var(--ink);margin-top:.35rem;letter-spacing:.02em}
 .work-label{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
 .work-title{font-family:var(--font-display);font-size:1.6rem;letter-spacing:.04em;margin-bottom:.75rem;line-height:1.2}
 .work-desc{font-size:.82rem;color:var(--muted);line-height:1.75;margin-bottom:1.25rem}
@@ -155,20 +168,13 @@ section{padding:6rem 3rem}
 #koma .section-label{color:rgba(255,255,255,.4)}
 #koma .section-label::before{background:rgba(255,255,255,.4)}
 #koma .section-title{color:var(--white)}
-.koma-track-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;user-select:none;margin-top:2.5rem;padding:0 3rem 2rem}
-.koma-track-wrap::-webkit-scrollbar{display:none}
-.koma-track-wrap.dragging{cursor:grabbing}
-.koma-track{display:flex;gap:1.5rem;width:max-content}
-.koma-ep{flex:0 0 auto;width:min(60vw,300px);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:transform .28s,box-shadow .28s}
-.koma-ep:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.koma-ep-thumb{width:100%;aspect-ratio:3/4;overflow:hidden;position:relative}
-.koma-ep-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.koma-ep:hover .koma-ep-thumb img{transform:scale(1.06)}
-.koma-ep-num{position:absolute;bottom:.8rem;left:1rem;font-family:var(--font-display);font-size:3.5rem;line-height:1;color:rgba(255,255,255,.7);text-shadow:0 2px 12px rgba(0,0,0,.3)}
-.koma-ep-body{padding:1rem 1.2rem 1.2rem}
-.koma-ep-label{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.35rem}
-.koma-ep-title{font-family:var(--font-display);font-size:1.4rem;letter-spacing:.06em;color:var(--white);line-height:1.1}
-.koma-ep-count{font-size:.75rem;color:rgba(255,255,255,.3);margin-top:.3rem}
+/* ===== KOMA VIEWER ===== */
+.koma-viewer{display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:2.5rem 2rem 3rem}
+.koma-viewer-img{border-radius:14px;overflow:hidden;flex-shrink:0;box-shadow:0 12px 48px rgba(0,0,0,.5)}
+.koma-viewer-img img{display:block;width:min(480px,80vw);height:auto}
+.koma-nav-btn{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;border-radius:50%;width:52px;height:52px;font-size:1.4rem;cursor:pointer;flex-shrink:0;transition:background .2s;backdrop-filter:blur(6px)}
+.koma-nav-btn:hover{background:rgba(255,255,255,.28)}
+.koma-counter{text-align:center;font-size:.75rem;color:rgba(255,255,255,.4);padding-bottom:1.5rem;letter-spacing:.1em}
 
 /* ===== STATS ===== */
 .stats-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:4rem}
@@ -260,8 +266,43 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   <a href="#contact" class="nav-mobile-link">Contact</a>
 </nav>
 
+<!-- ページ全体の浮遊絵文字 -->
+<div class="page-deco" aria-hidden="true">
+  <span style="top:5%;left:3%">🌸</span>
+  <span style="top:12%;left:18%">⭐</span>
+  <span style="top:8%;left:35%">🍮</span>
+  <span style="top:15%;left:52%">✨</span>
+  <span style="top:6%;left:68%">🎂</span>
+  <span style="top:18%;left:82%">🌷</span>
+  <span style="top:25%;left:91%">🍡</span>
+  <span style="top:32%;left:7%">🧁</span>
+  <span style="top:38%;left:24%">⭐</span>
+  <span style="top:44%;left:45%">🌸</span>
+  <span style="top:40%;left:60%">🍰</span>
+  <span style="top:35%;left:77%">✨</span>
+  <span style="top:50%;left:2%">🎀</span>
+  <span style="top:55%;left:15%">🌷</span>
+  <span style="top:60%;left:30%">🍡</span>
+  <span style="top:52%;left:50%">⭐</span>
+  <span style="top:58%;left:65%">🧁</span>
+  <span style="top:62%;left:85%">🌸</span>
+  <span style="top:70%;left:8%">✨</span>
+  <span style="top:72%;left:22%">🍮</span>
+  <span style="top:68%;left:40%">🎂</span>
+  <span style="top:75%;left:55%">🌷</span>
+  <span style="top:78%;left:72%">🍰</span>
+  <span style="top:80%;left:88%">⭐</span>
+  <span style="top:85%;left:5%">🌸</span>
+  <span style="top:88%;left:28%">🎀</span>
+  <span style="top:82%;left:45%">✨</span>
+  <span style="top:90%;left:62%">🍡</span>
+  <span style="top:93%;left:80%">🧁</span>
+  <span style="top:95%;left:12%">🌷</span>
+</div>
+
 <!-- Hero -->
 <section class="hero" aria-labelledby="hero-title">
+  <img class="hero-bg-img" src="images/sakura/3.png" alt="" loading="eager">
   <span class="deco" style="top:10%;left:6%" aria-hidden="true">🌸</span>
   <span class="deco" style="top:18%;right:8%;animation-delay:-1s" aria-hidden="true">⭐</span>
   <span class="deco" style="bottom:22%;left:10%;animation-delay:-3s" aria-hidden="true">🍡</span>
@@ -316,7 +357,7 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         <div class="stat-label">生成ページ数</div>
       </div>
       <div class="stat">
-        <div class="stat-num">3<span class="stat-unit">話</span></div>
+        <div class="stat-num">9<span class="stat-unit">話</span></div>
         <div class="stat-label">シリーズ展開中</div>
       </div>
     </div>
@@ -357,87 +398,108 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
     <p class="section-body reveal">季節の行事と料理をテーマに、子どもたちが楽しく学べる漫画シリーズ。</p>
     <div class="filter-bar reveal">
       <button class="filter-btn active" data-filter="all">すべて</button>
-      <button class="filter-btn" data-filter="winter">❄️ Winter</button>
-      <button class="filter-btn" data-filter="events">🎂 Events</button>
-      <button class="filter-btn" data-filter="sakura">🌸 Spring</button>
+      <button class="filter-btn" data-filter="vol1">🍰 Vol.1</button>
+      <button class="filter-btn" data-filter="events">🎉 イベント</button>
+      <button class="filter-btn" data-filter="special">✨ 番外編</button>
     </div>
     <div class="works-grid">
 
-      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" data-series="winter">
+      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" data-series="story1">
         <div class="work-thumb">
-          <img src="images/winter/1-1.jpg" alt="" loading="lazy">
+          <img src="images/kindle1/1-1.jpg" alt="" loading="lazy">
           <span class="work-num">01</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Winter · 8ページ</p>
-          <div class="work-tags">
-            <span class="tag">雪遊び</span><span class="tag">冬</span>
-          </div>
+          <p class="work-label">Vol.1 · 11ページ</p>
+          <p class="work-title-text">ぷりんつくりたい</p>
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" data-series="setsubun">
+      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" data-series="story2">
         <div class="work-thumb">
-          <img src="images/events/setsubun-1.jpg" alt="" loading="lazy">
+          <img src="images/kindle1/9-1.jpg" alt="" loading="lazy">
           <span class="work-num">02</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Events · 2ページ</p>
-          <div class="work-tags">
-            <span class="tag">節分</span><span class="tag">恵方巻</span>
-          </div>
+          <p class="work-label">Vol.1 · 11ページ</p>
+          <p class="work-title-text">ダイエット大作戦</p>
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" data-series="valentine">
+      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" data-series="story3">
         <div class="work-thumb">
-          <img src="images/events/valentine.jpg" alt="" loading="lazy">
+          <img src="images/kindle1/10-1.jpg" alt="" loading="lazy">
           <span class="work-num">03</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Events · 3ページ</p>
-          <div class="work-tags">
-            <span class="tag">バレンタイン</span><span class="tag">チョコ</span>
-          </div>
+          <p class="work-label">Vol.1 · 11ページ</p>
+          <p class="work-title-text">イチゴフェア</p>
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" data-series="birthday">
+      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" data-series="story4">
         <div class="work-thumb">
-          <img src="images/events/birthday.jpg" alt="" loading="lazy">
+          <img src="images/kindle2/節分.jpg" alt="" loading="lazy">
           <span class="work-num">04</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Events · 2ページ</p>
-          <div class="work-tags">
-            <span class="tag">誕生日</span><span class="tag">ケーキ</span>
-          </div>
+          <p class="work-label">イベント · 12ページ</p>
+          <p class="work-title-text">鬼退治大作戦</p>
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" data-series="catday">
+      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" data-series="story5">
         <div class="work-thumb">
-          <img src="images/events/cat-day.jpg" alt="" loading="lazy">
+          <img src="images/kindle2/新節分１.jpg" alt="" loading="lazy">
           <span class="work-num">05</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Events · 1ページ</p>
-          <div class="work-tags">
-            <span class="tag">猫の日</span>
-          </div>
+          <p class="work-label">イベント · 10ページ</p>
+          <p class="work-title-text">鬼退治大作戦！？</p>
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" data-series="sakura">
+      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" data-series="story6">
         <div class="work-thumb">
-          <img src="images/sakura/1.png" alt="" loading="lazy">
+          <img src="images/kindle2/もうすぐ誕生日.jpg" alt="" loading="lazy">
           <span class="work-num">06</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Spring · 21ページ</p>
-          <div class="work-tags">
-            <span class="tag">お花見</span><span class="tag">桜スイーツ</span>
-          </div>
+          <p class="work-label">イベント · 9ページ</p>
+          <p class="work-title-text">もうすぐ誕生日</p>
+        </div>
+      </div>
+
+      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" data-series="story7">
+        <div class="work-thumb">
+          <img src="images/kindle2/バレンタイン.jpg" alt="" loading="lazy">
+          <span class="work-num">07</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">イベント · 13ページ</p>
+          <p class="work-title-text">バレンタインデー</p>
+        </div>
+      </div>
+
+      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" data-series="story8">
+        <div class="work-thumb">
+          <img src="images/kindle2/もうすぐ猫の日.jpg" alt="" loading="lazy">
+          <span class="work-num">08</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">イベント · 10ページ</p>
+          <p class="work-title-text">にゃんにゃんにゃんの日</p>
+        </div>
+      </div>
+
+      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" data-series="story9">
+        <div class="work-thumb">
+          <img src="images/kindle1/オラフの真似.jpg" alt="" loading="lazy">
+          <span class="work-num">09</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">番外編 · 12ページ</p>
+          <p class="work-title-text">思い出の1ページ</p>
         </div>
       </div>
 
@@ -451,27 +513,12 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
     <p class="section-label reveal">4-Panel Manga</p>
     <h2 class="section-title reveal" id="koma-heading">4コマ漫画</h2>
   </div>
-  <div class="koma-track-wrap reveal">
-    <div class="koma-track" id="koma-track"><!-- JS で生成 --></div>
+  <div class="koma-viewer reveal">
+    <button class="koma-nav-btn" id="koma-prev">‹</button>
+    <div class="koma-viewer-img"><img id="koma-img" src="" alt=""></div>
+    <button class="koma-nav-btn" id="koma-next">›</button>
   </div>
-</section>
-
-<!-- Featured -->
-<section style="background:var(--accent-lt)" aria-labelledby="featured-heading">
-  <div class="container">
-    <div class="featured-inner">
-      <div>
-        <p class="section-label reveal">Featured</p>
-        <h2 class="section-title reveal" id="featured-heading">桜ミルクプリンを<br>一緒に作ろう</h2>
-        <blockquote class="featured-quote reveal">「この葉っぱ、食べてもいいの？<br>それとも飾りのドレス？」</blockquote>
-        <p class="section-body reveal">たまご君の素朴な疑問から始まるお菓子の科学。桜の塩漬けからゼラチンの不思議まで、パティシエちゃんが優しく教えてくれる全8ページ。</p>
-        <a href="#works" class="btn-pill" style="margin-top:2rem;display:inline-block">作品を見る</a>
-      </div>
-      <div class="featured-img reveal">
-        <img src="images/sakura/3.png" alt="桜ミルクプリンを作るパティシエちゃんとたまご君" loading="lazy">
-      </div>
-    </div>
-  </div>
+  <p class="koma-counter" id="koma-counter"></p>
 </section>
 
 <!-- Process (dark) -->
@@ -552,86 +599,27 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   window.addEventListener('load', () => setTimeout(hideLoader, 2000));
   setTimeout(hideLoader, 5000); // 最大 5 秒で強制非表示
 
-  // 4コマ横スクロール生成
-  const komaTrack = document.getElementById('koma-track');
-  if (komaTrack) {
-    // 1-10=第1話, 11-20=第2話, 21=第3話(制作中)
-    const PAGES_PER_EP = 10;
-    const TOTAL = 21;
-    const episodes = [];
-    for (let start = 1; start <= TOTAL; start += PAGES_PER_EP) {
-      const end = Math.min(start + PAGES_PER_EP - 1, TOTAL);
-      episodes.push({ start, end });
+  // 4コマ ビューア
+  const komaImg = document.getElementById('koma-img');
+  if (komaImg) {
+    const KOMA_PAGES = ['1','12','11','10','9','8','7','6','2','3','4','5','13','14','15','16','17','18','19','20','21'];
+    let cur = 0;
+    const counter = document.getElementById('koma-counter');
+    function showKoma(i) {
+      cur = ((i % KOMA_PAGES.length) + KOMA_PAGES.length) % KOMA_PAGES.length;
+      komaImg.src = `images/sakura/${KOMA_PAGES[cur]}.png`;
+      komaImg.alt = `4コマ ${cur + 1}`;
+      counter.textContent = `${cur + 1} / ${KOMA_PAGES.length}`;
     }
-
-    episodes.forEach((ep, idx) => {
-      const epNum = idx + 1;
-      const pageCount = ep.end - ep.start + 1;
-      const isComplete = pageCount === PAGES_PER_EP;
-
-      const card = document.createElement('div');
-      card.className = 'koma-ep';
-      card.setAttribute('role', 'button');
-      card.setAttribute('tabindex', '0');
-
-      const thumb = document.createElement('div');
-      thumb.className = 'koma-ep-thumb';
-      const img = document.createElement('img');
-      img.src = `images/4koma/${ep.start}.png`;
-      img.alt = `第${epNum}話 表紙`;
-      img.loading = 'lazy';
-      thumb.appendChild(img);
-
-      // 話数を画像上にオーバーレイ
-      const numEl = document.createElement('span');
-      numEl.className = 'koma-ep-num';
-      numEl.textContent = String(epNum).padStart(2, '0');
-      thumb.appendChild(numEl);
-
-      const body = document.createElement('div');
-      body.className = 'koma-ep-body';
-      body.innerHTML = `
-        <p class="koma-ep-count">${pageCount}ページ${isComplete ? '' : '（制作中）'}</p>`;
-
-      card.append(thumb, body);
-
-      // クリックでライトボックス（縦読み）
-      const pages = [];
-      for (let p = ep.start; p <= ep.end; p++) {
-        pages.push([`images/4koma/${p}.png`, `第${epNum}話 ${p - ep.start + 1}ページ`]);
-      }
-      const handler = () => {
-        const s = { title: `第${epNum}話`, pages };
-        const titleEl = document.createElement('h2');
-        titleEl.id = 'lb-title';
-        titleEl.className = 'lb-title';
-        titleEl.textContent = s.title;
-        const scroll = document.createElement('div');
-        scroll.className = 'lb-scroll';
-        s.pages.forEach(([src, alt]) => {
-          const i = document.createElement('img');
-          i.src = src; i.alt = alt; i.loading = 'lazy';
-          scroll.appendChild(i);
-        });
-        lbInner.replaceChildren(titleEl, scroll);
-        lb.classList.add('open');
-        lb.scrollTo(0, 0);
-        document.body.style.overflow = 'hidden';
-        lbClose.focus();
-      };
-      card.addEventListener('click', handler);
-      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
-      komaTrack.appendChild(card);
+    document.getElementById('koma-prev').addEventListener('click', () => showKoma(cur - 1));
+    document.getElementById('koma-next').addEventListener('click', () => showKoma(cur + 1));
+    // キーボード
+    document.addEventListener('keydown', e => {
+      if (document.getElementById('lightbox')?.classList.contains('open')) return;
+      if (e.key === 'ArrowRight') showKoma(cur + 1);
+      if (e.key === 'ArrowLeft') showKoma(cur - 1);
     });
-
-    // ドラッグスクロール
-    const wrap = komaTrack.parentElement;
-    let isDown = false, startX, scrollLeft, moved = false;
-    wrap.addEventListener('mousedown', e => { isDown = true; moved = false; wrap.classList.add('dragging'); startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft; });
-    wrap.addEventListener('mouseleave', () => { isDown = false; wrap.classList.remove('dragging'); });
-    wrap.addEventListener('mouseup', () => { isDown = false; wrap.classList.remove('dragging'); });
-    wrap.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const dx = e.pageX - wrap.offsetLeft - startX; if (Math.abs(dx) > 5) moved = true; wrap.scrollLeft = scrollLeft - dx; });
-    wrap.addEventListener('click', e => { if (moved) { e.stopPropagation(); moved = false; } }, true);
+    showKoma(0);
   }
 
   // fix[S]: observer.unobserve() でメモリ解放
@@ -646,13 +634,18 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // タグフィルター
+  const tagMap = {
+    story1:'vol1', story2:'vol1', story3:'vol1',
+    story4:'events', story5:'events', story6:'events', story7:'events', story8:'events',
+    story9:'special', story10:'special',
+  };
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
       document.querySelectorAll('.work-card').forEach(card => {
-        const match = filter === 'all' || card.dataset.series === filter;
+        const match = filter === 'all' || tagMap[card.dataset.series] === filter;
         card.classList.toggle('hidden', !match);
       });
     });
@@ -679,44 +672,99 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   // LIGHTBOX
   // SERIES の値は全てハードコード。外部入力を src に代入しないこと。
   const SERIES = {
-    winter: {
-      title: '01',
+    story1: {
+      title: 'ぷりんつくりたい',
       pages: [
-        ['images/winter/1-1.jpg', 'p1'],['images/winter/1-2.jpg', 'p2'],
-        ['images/winter/1-3.jpg', 'p3'],['images/winter/1-4.jpg', 'p4'],
-        ['images/winter/1-5.jpg', 'p5'],['images/winter/1-6.jpg', 'p6'],
-        ['images/winter/snowman.jpg', 'p7'],['images/winter/slide.jpg', 'p8'],
+        ['images/kindle1/005.jpg','p1'],['images/kindle1/1-1.jpg','p2'],['images/kindle1/1-2.jpg','p3'],
+        ['images/kindle1/1-3.jpg','p4'],['images/kindle1/1-4.jpg','p5'],['images/kindle1/1-5.jpg','p6'],
+        ['images/kindle1/1-6.jpg','p7'],['images/kindle1/1-7.jpg','p8'],['images/kindle1/1-8.jpg','p9'],
+        ['images/kindle1/1-9.jpg','p10'],['images/kindle1/1-10.jpg','p11'],
       ]
     },
-    setsubun: {
-      title: '02',
+    story2: {
+      title: 'ダイエット大作戦',
       pages: [
-        ['images/events/setsubun-1.jpg', 'p1'],['images/events/setsubun-2.jpg', 'p2'],
+        ['images/kindle1/003.jpg','p1'],['images/kindle1/9-1.jpg','p2'],['images/kindle1/9-2.jpg','p3'],
+        ['images/kindle1/9-3.jpg','p4'],['images/kindle1/9-4.jpg','p5'],['images/kindle1/9-5.jpg','p6'],
+        ['images/kindle1/9-6.jpg','p7'],['images/kindle1/9-7.jpg','p8'],['images/kindle1/9-8.jpg','p9'],
+        ['images/kindle1/9-9.jpg','p10'],['images/kindle1/9-10.jpg','p11'],
       ]
     },
-    valentine: {
-      title: '03',
+    story3: {
+      title: 'イチゴフェア',
       pages: [
-        ['images/events/valentine.jpg', 'p1'],['images/events/happy-valentine.jpg', 'p2'],
-        ['images/events/chocolate.jpg', 'p3'],
+        ['images/kindle1/004.jpg','p1'],['images/kindle1/10-1.jpg','p2'],['images/kindle1/10-2.jpg','p3'],
+        ['images/kindle1/10-3.jpg','p4'],['images/kindle1/10-4.jpg','p5'],['images/kindle1/10-5.jpg','p6'],
+        ['images/kindle1/10-6.jpg','p7'],['images/kindle1/10-7.jpg','p8'],['images/kindle1/10-8.jpg','p9'],
+        ['images/kindle1/10-9.jpg','p10'],['images/kindle1/10-10.jpg','p11'],
       ]
     },
-    birthday: {
-      title: '04',
+    story4: {
+      title: '鬼退治大作戦',
       pages: [
-        ['images/events/birthday.jpg', 'p1'],['images/events/birthday-2.jpg', 'p2'],
+        ['images/kindle2/006.jpg','p1'],['images/kindle2/節分.jpg','p2'],['images/kindle2/節分２.jpg','p3'],
+        ['images/kindle2/節分３.jpg','p4'],['images/kindle2/節分４.jpg','p5'],['images/kindle2/節分の後.jpg','p6'],
+        ['images/kindle2/節分の後２.jpg','p7'],['images/kindle2/節分の後３.jpg','p8'],['images/kindle2/節分の後４.jpg','p9'],
+        ['images/kindle2/節分の後５.jpg','p10'],['images/kindle2/節分の後６.jpg','p11'],['images/kindle2/思い出　節分.jpg','p12'],
       ]
     },
-    catday: {
-      title: '05',
+    story5: {
+      title: '鬼退治大作戦！？',
       pages: [
-        ['images/events/cat-day.jpg', 'p1'],
+        ['images/kindle2/新節分１.jpg','p1'],['images/kindle2/新節分２.jpg','p2'],['images/kindle2/新節分３.jpg','p3'],
+        ['images/kindle2/新節分４.jpg','p4'],['images/kindle2/新節分５.jpg','p5'],['images/kindle2/新節分６.jpg','p6'],
+        ['images/kindle2/新節分７.jpg','p7'],['images/kindle2/新節分８.jpg','p8'],['images/kindle2/新節分９.jpg','p9'],
+        ['images/kindle2/新節分10.jpg','p10'],
       ]
     },
-    sakura: {
-      title: '06',
-      pages: Array.from({ length: 21 }, (_, i) => [`images/sakura/${i + 1}.png`, `p${i + 1}`])
-    }
+    story6: {
+      title: 'もうすぐ誕生日',
+      pages: [
+        ['images/kindle2/008.jpg','p1'],['images/kindle2/もうすぐ誕生日.jpg','p2'],['images/kindle2/もうすぐ誕生日２.jpg','p3'],
+        ['images/kindle2/誕生日.jpg','p4'],['images/kindle2/誕生日２.jpg','p5'],['images/kindle2/誕生日３.jpg','p6'],
+        ['images/kindle2/誕生日４.jpg','p7'],['images/kindle2/誕生日５.jpg','p8'],['images/kindle2/誕生日プレゼント２.jpg','p9'],
+      ]
+    },
+    story7: {
+      title: 'バレンタインデー',
+      pages: [
+        ['images/kindle2/010.jpg','p1'],['images/kindle2/バレンタイン.jpg','p2'],['images/kindle2/ハッピーバレンタイン.jpg','p3'],
+        ['images/kindle2/チョコレート.jpg','p4'],['images/kindle2/チョコレート２.jpg','p5'],['images/kindle2/チョコレート３.jpg','p6'],
+        ['images/kindle2/チョコレート４.jpg','p7'],['images/kindle2/チョコレート５.jpg','p8'],['images/kindle2/チョコレート６.jpg','p9'],
+        ['images/kindle2/チョコレート７.jpg','p10'],['images/kindle2/チョコレート８.jpg','p11'],['images/kindle2/チョコレート９.jpg','p12'],
+        ['images/kindle2/チョコレート１０.jpg','p13'],
+      ]
+    },
+    story8: {
+      title: 'にゃんにゃんにゃんの日',
+      pages: [
+        ['images/kindle2/007.jpg','p1'],['images/kindle2/もうすぐ猫の日.jpg','p2'],['images/kindle2/もうすぐ猫の日２.jpg','p3'],
+        ['images/kindle2/もうすぐ猫の日３.jpg','p4'],['images/kindle2/もうすぐ猫の日４.jpg','p5'],['images/kindle2/もうすぐ猫の日５.jpg','p6'],
+        ['images/kindle2/もうすぐ猫の日６.jpg','p7'],['images/kindle2/もうすぐ猫の日７.jpg','p8'],['images/kindle2/虫の日.jpg','p9'],
+        ['images/kindle2/虫の日２.jpg','p10'],
+      ]
+    },
+    story9: {
+      title: '思い出の1ページ',
+      pages: [
+        ['images/kindle1/009.jpg','p1'],['images/kindle1/オラフの真似.jpg','p2'],['images/kindle1/滑り台.jpg','p3'],
+        ['images/kindle1/雪だるま.jpg','p4'],['images/kindle1/雪遊び１.jpg','p5'],['images/kindle1/雪遊び２.jpg','p6'],
+        ['images/kindle2/プレゼント.jpg','p7'],['images/kindle2/ホワイトデー.jpg','p8'],['images/kindle2/チラシ寿司.jpg','p9'],
+        ['images/kindle2/チラシ寿司２.jpg','p10'],['images/kindle2/パーティ.jpg','p11'],['images/kindle2/パーティーの準備.jpg','p12'],
+      ]
+    },
+    story10: {
+      title: '4コマ漫画',
+      pages: [
+        ['images/sakura/1.png','p1'],['images/sakura/12.png','p2'],['images/sakura/11.png','p3'],
+        ['images/sakura/10.png','p4'],['images/sakura/9.png','p5'],['images/sakura/8.png','p6'],
+        ['images/sakura/7.png','p7'],['images/sakura/6.png','p8'],['images/sakura/2.png','p9'],
+        ['images/sakura/3.png','p10'],['images/sakura/4.png','p11'],['images/sakura/5.png','p12'],
+        ['images/sakura/13.png','p13'],['images/sakura/14.png','p14'],['images/sakura/15.png','p15'],
+        ['images/sakura/16.png','p16'],['images/sakura/17.png','p17'],['images/sakura/18.png','p18'],
+        ['images/sakura/19.png','p19'],['images/sakura/20.png','p20'],['images/sakura/21.png','p21'],
+      ]
+    },
   };
 
   const lb = document.getElementById('lightbox');
