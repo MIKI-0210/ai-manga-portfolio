@@ -147,6 +147,19 @@ section{padding:6rem 3rem}
 /* fix[W]: インラインスタイルをクラスに統一 */
 .reveal-delay-4{transition-delay:.4s}
 
+/* ===== 4KOMA SCROLL ===== */
+#koma{background:var(--ink);overflow:hidden}
+#koma .section-label{color:rgba(255,255,255,.4)}
+#koma .section-label::before{background:rgba(255,255,255,.4)}
+#koma .section-title{color:var(--white)}
+.koma-track-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;user-select:none;margin-top:2.5rem}
+.koma-track-wrap::-webkit-scrollbar{display:none}
+.koma-track-wrap.dragging{cursor:grabbing}
+.koma-track{display:flex;gap:1rem;width:max-content;padding-bottom:.5rem}
+.koma-item{flex:0 0 auto;width:min(72vw,480px);border-radius:14px;overflow:hidden;position:relative}
+.koma-item img{width:100%;height:auto;display:block;border-radius:14px}
+.koma-num{position:absolute;bottom:.75rem;right:.9rem;font-family:var(--font-display);font-size:.85rem;letter-spacing:.1em;color:rgba(255,255,255,.6)}
+
 /* ===== STATS ===== */
 .stats-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:4rem}
 .stat{background:var(--white);padding:3rem 2rem;text-align:center}
@@ -397,6 +410,19 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   </div>
 </section>
 
+<!-- 4コマ横スクロール -->
+<section id="koma" aria-labelledby="koma-heading">
+  <div class="container">
+    <p class="section-label reveal">4-Panel Manga</p>
+    <h2 class="section-title reveal" id="koma-heading">4コマ漫画</h2>
+  </div>
+  <div class="koma-track-wrap reveal">
+    <div class="koma-track" id="koma-track">
+      <!-- JS で生成 -->
+    </div>
+  </div>
+</section>
+
 <!-- Featured -->
 <section style="background:var(--accent-lt)" aria-labelledby="featured-heading">
   <div class="container">
@@ -492,6 +518,31 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   };
   window.addEventListener('load', () => setTimeout(hideLoader, 2000));
   setTimeout(hideLoader, 5000); // 最大 5 秒で強制非表示
+
+  // 4コマ横スクロール生成
+  const komaTrack = document.getElementById('koma-track');
+  if (komaTrack) {
+    for (let i = 1; i <= 21; i++) {
+      const item = document.createElement('div');
+      item.className = 'koma-item';
+      const img = document.createElement('img');
+      img.src = `images/4koma/${i}.png`;
+      img.alt = `4コマ漫画 ${i}`;
+      img.loading = 'lazy';
+      const num = document.createElement('span');
+      num.className = 'koma-num';
+      num.textContent = `${i} / 21`;
+      item.append(img, num);
+      komaTrack.appendChild(item);
+    }
+    // ドラッグスクロール
+    const wrap = komaTrack.parentElement;
+    let isDown = false, startX, scrollLeft;
+    wrap.addEventListener('mousedown', e => { isDown = true; wrap.classList.add('dragging'); startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft; });
+    wrap.addEventListener('mouseleave', () => { isDown = false; wrap.classList.remove('dragging'); });
+    wrap.addEventListener('mouseup', () => { isDown = false; wrap.classList.remove('dragging'); });
+    wrap.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); wrap.scrollLeft = scrollLeft - (e.pageX - wrap.offsetLeft - startX); });
+  }
 
   // fix[S]: observer.unobserve() でメモリ解放
   const observer = new IntersectionObserver((entries) => {
