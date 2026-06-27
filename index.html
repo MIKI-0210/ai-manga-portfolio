@@ -3,23 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Manga Studio</title>
+<title>AI Manga Studio — みきまるポートフォリオ</title>
+<meta name="description" content="Claude × Gemini Imagenで作るAI漫画。たまご君・パティシエちゃんシリーズのKindle出版からX投稿まで。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --ink:#1a1a1a;
   --muted:#888;
-  --pink:#f4a7b9;
-  --pink-lt:#fef0f4;
-  --yellow:#ffd580;
-  --green:#b8ddb0;
+  --accent:#f4a7b9;
+  --accent-lt:#fef0f4;
   --border:#e8e8e8;
   --white:#ffffff;
   --font-display:'Bebas Neue',sans-serif;
   --font-body:'Noto Sans JP',sans-serif;
-  --font-serif:'Noto Serif JP',serif;
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--font-body);color:var(--ink);background:var(--white);overflow-x:hidden}
@@ -28,7 +26,7 @@ a{color:inherit;text-decoration:none}
 
 /* ===== LOADER ===== */
 #loader{position:fixed;inset:0;background:var(--white);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,visibility .6s ease}
-#loader.hidden{opacity:0;visibility:hidden}
+#loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .loader-text{font-family:var(--font-display);font-size:clamp(2rem,8vw,5rem);letter-spacing:.15em;color:var(--ink);animation:pulse 1.2s ease-in-out infinite}
 .loader-sub{font-size:.75rem;letter-spacing:.25em;color:var(--muted);margin-top:.75rem;text-transform:uppercase}
 .loader-bar{width:200px;height:2px;background:var(--border);margin-top:2rem;border-radius:2px;overflow:hidden}
@@ -36,26 +34,36 @@ a{color:inherit;text-decoration:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes load{0%{width:0}100%{width:100%}}
 
-/* ===== DECO ELEMENTS ===== */
+/* ===== DECO ===== */
 .deco{position:absolute;pointer-events:none;user-select:none;font-size:1.6rem;animation:float 6s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-18px) rotate(8deg)}}
 .deco:nth-child(2n){animation-duration:8s;animation-delay:-2s}
 .deco:nth-child(3n){animation-duration:7s;animation-delay:-4s}
 
 /* ===== NAV ===== */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;mix-blend-mode:multiply}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 .nav-logo{font-family:var(--font-display);font-size:1.5rem;letter-spacing:.1em}
 .nav-links{display:flex;gap:2.5rem;list-style:none}
 .nav-links a{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink);border-bottom:1px solid transparent;transition:border-color .2s}
 .nav-links a:hover{border-bottom-color:var(--ink)}
 
+/* ハンバーガー */
+.nav-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--ink);transition:transform .3s,opacity .3s}
+.nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-mobile{display:none;flex-direction:column;gap:0;position:fixed;top:60px;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:99}
+.nav-mobile.open{display:flex}
+.nav-mobile a{display:block;padding:1rem 3rem;font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+
 /* ===== HERO ===== */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--pink-lt);padding:7rem 3rem 5rem}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--accent-lt);padding:7rem 3rem 5rem}
 .hero-content{text-align:center;position:relative;z-index:2}
 .hero-eyebrow{font-size:.78rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
 .hero-title{font-family:var(--font-display);font-size:clamp(4rem,12vw,10rem);line-height:.9;letter-spacing:.04em;margin-bottom:2rem}
 .hero-title span{display:block}
-.hero-title .accent{color:var(--pink);-webkit-text-stroke:2px var(--pink)}
+.hero-title .accent{color:var(--accent)}
 .hero-body{font-size:1rem;color:var(--muted);line-height:1.85;max-width:40ch;margin:0 auto 2.5rem}
 .btn-pill{display:inline-block;background:var(--ink);color:var(--white);font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;padding:.85rem 2.5rem;border-radius:100px;transition:transform .2s,background .2s}
 .btn-pill:hover{transform:scale(1.04);background:#333}
@@ -67,9 +75,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
 /* ===== MARQUEE ===== */
 .marquee-wrap{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:.75rem 0;background:var(--white)}
-.marquee-track{display:flex;gap:3rem;animation:marquee 20s linear infinite;white-space:nowrap}
+.marquee-track{display:flex;gap:3rem;animation:marquee 22s linear infinite;white-space:nowrap}
 .marquee-item{font-family:var(--font-display);font-size:1.1rem;letter-spacing:.1em;color:var(--muted);flex-shrink:0}
-.marquee-item span{color:var(--pink);margin-right:1rem}
+.marquee-item span{color:var(--accent);margin-right:1rem}
 @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* ===== SECTION ===== */
@@ -82,26 +90,21 @@ section{padding:6rem 3rem}
 
 /* ===== CHARS ===== */
 .chars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem}
-.char-card{background:var(--white);border:1px solid var(--border);padding:2.5rem 2rem;border-radius:16px;text-align:center;transition:transform .3s,box-shadow .3s;position:relative;overflow:hidden}
-.char-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pink),var(--yellow))}
+.char-card{background:var(--white);border:1px solid var(--border);padding:2.5rem 2rem;border-radius:16px;text-align:center;transition:transform .28s,box-shadow .28s;position:relative;overflow:hidden}
+.char-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent)}
 .char-card:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.08)}
-.char-icon{font-size:4rem;margin-bottom:1.5rem;display:block}
-.char-img{width:180px;height:180px;border-radius:50%;overflow:hidden;margin:0 auto 1.5rem;border:3px solid var(--pink);background:linear-gradient(180deg,#7ec8e3 0%,#a8ddf0 40%,#c8eef8 70%,#e0f6ff 100%);position:relative;box-shadow:0 4px 20px rgba(126,200,227,.35)}
-.char-img::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 70px 28px at 30% 22%,rgba(255,255,255,.85) 0%,rgba(255,255,255,.5) 50%,transparent 70%),radial-gradient(ellipse 50px 22px at 62% 18%,rgba(255,255,255,.8) 0%,rgba(255,255,255,.4) 50%,transparent 70%),radial-gradient(ellipse 38px 16px at 78% 30%,rgba(255,255,255,.75) 0%,transparent 65%);pointer-events:none;z-index:1}
-.char-img img{width:100%;height:100%;object-fit:contain;object-position:center bottom;position:relative;z-index:2;padding:4px 4px 0}
+.char-img{width:180px;height:180px;border-radius:50%;overflow:hidden;margin:0 auto 1.5rem;border:3px solid var(--accent);background:var(--accent-lt);position:relative}
+.char-img img{width:100%;height:100%;object-fit:contain;object-position:center bottom;padding:4px 4px 0}
 .char-name{font-family:var(--font-display);font-size:2rem;letter-spacing:.06em;margin-bottom:.75rem}
 .char-desc{font-size:.85rem;color:var(--muted);line-height:1.8}
 
 /* ===== WORKS ===== */
 #works{background:#fafafa}
 .works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem}
-.work-card{border-radius:16px;overflow:hidden;background:var(--white);border:1px solid var(--border);cursor:pointer;transition:transform .3s,box-shadow .3s;position:relative}
+.work-card{border-radius:16px;overflow:hidden;background:var(--white);border:1px solid var(--border);cursor:pointer;transition:transform .28s,box-shadow .28s;position:relative}
 .work-card:hover{transform:translateY(-8px);box-shadow:0 24px 64px rgba(0,0,0,.1)}
 .work-thumb{aspect-ratio:3/4;position:relative;overflow:hidden}
-.work-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:4rem;background:linear-gradient(135deg,var(--pink-lt),var(--yellow))}
-.work-thumb-placeholder.green{background:linear-gradient(135deg,#e8f5e4,var(--green))}
-.work-thumb-placeholder.blue{background:linear-gradient(135deg,#e8f0fe,#b8d0f8)}
-.work-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.work-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
 .work-card:hover .work-thumb img{transform:scale(1.06)}
 .work-badge{position:absolute;top:1rem;right:1rem;background:var(--ink);color:var(--white);font-size:.68rem;letter-spacing:.1em;padding:.3rem .9rem;border-radius:100px;text-transform:uppercase}
 .work-body{padding:1.5rem}
@@ -113,10 +116,11 @@ section{padding:6rem 3rem}
 
 /* ===== FEATURED ===== */
 .featured-inner{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
-.featured-img{border-radius:24px;overflow:hidden;height:480px;background:linear-gradient(135deg,var(--pink-lt),var(--yellow));display:flex;align-items:center;justify-content:center;font-size:6rem}
-.featured-quote{font-family:var(--font-serif);font-size:1.4rem;font-weight:300;line-height:1.7;color:var(--ink);margin:2rem 0;padding-left:1.5rem;border-left:3px solid var(--pink)}
+.featured-img{border-radius:24px;overflow:hidden;height:480px}
+.featured-img img{width:100%;height:100%;object-fit:cover}
+.featured-quote{font-size:1.3rem;font-weight:300;line-height:1.7;color:var(--ink);margin:2rem 0;padding-left:1.5rem;border-left:3px solid var(--accent)}
 
-/* ===== PROCESS ===== */
+/* ===== PROCESS (dark) ===== */
 #process{background:var(--ink);color:var(--white)}
 #process .section-label{color:rgba(255,255,255,.4)}
 #process .section-label::before{background:rgba(255,255,255,.4)}
@@ -131,16 +135,16 @@ section{padding:6rem 3rem}
 .stats-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:4rem}
 .stat{background:var(--white);padding:3rem 2rem;text-align:center}
 .stat-num{font-family:var(--font-display);font-size:4.5rem;line-height:1;color:var(--ink)}
-.stat-unit{font-family:var(--font-display);font-size:2rem;color:var(--pink)}
+.stat-unit{font-family:var(--font-display);font-size:2rem;color:var(--accent)}
 .stat-label{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.5rem}
 
 /* ===== CONTACT ===== */
-#contact{background:var(--pink-lt);text-align:center}
+#contact{background:var(--accent-lt);text-align:center}
 #contact .section-label{justify-content:center}
 #contact .section-label::before{display:none}
 #contact .section-title{font-size:clamp(3rem,8vw,7rem)}
 #contact .section-body{margin:0 auto 3rem}
-.contact-actions{display:flex;justify-content:center;gap:1rem}
+.contact-actions{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
 
 /* ===== FOOTER ===== */
 footer{background:var(--ink);color:rgba(255,255,255,.35);padding:2rem 3rem;display:flex;justify-content:space-between;align-items:center;font-size:.75rem;letter-spacing:.1em}
@@ -162,51 +166,61 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
 .reveal-delay-2{transition-delay:.2s}
 .reveal-delay-3{transition-delay:.3s}
 
+/* ===== RESPONSIVE ===== */
 @media(max-width:900px){
   nav{padding:1rem 1.5rem}
   .nav-links{display:none}
+  .nav-toggle{display:flex}
   section{padding:4rem 1.5rem}
   .hero{padding:6rem 1.5rem 4rem}
   .chars-grid,.works-grid,.process-list{grid-template-columns:1fr}
   .featured-inner{grid-template-columns:1fr}
+  .featured-img{height:260px}
   .stats-wrap{grid-template-columns:1fr}
-  .contact-actions{flex-direction:column;align-items:center}
+  footer{flex-direction:column;gap:1rem;text-align:center}
 }
 </style>
 </head>
 <body>
 
 <!-- Loader -->
-<div id="loader">
+<div id="loader" role="status" aria-label="読み込み中">
   <div class="loader-text">LOADING</div>
   <div class="loader-sub">AI Manga Studio</div>
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
 </div>
 
 <!-- Nav -->
-<nav>
+<nav aria-label="メインナビゲーション">
   <div class="nav-logo">AI Manga</div>
-  <ul class="nav-links">
+  <ul class="nav-links" role="list">
     <li><a href="#about">Characters</a></li>
     <li><a href="#works">Works</a></li>
     <li><a href="#process">Process</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<nav class="nav-mobile" aria-label="モバイルナビゲーション">
+  <a href="#about" class="nav-mobile-link">Characters</a>
+  <a href="#works" class="nav-mobile-link">Works</a>
+  <a href="#process" class="nav-mobile-link">Process</a>
+  <a href="#contact" class="nav-mobile-link">Contact</a>
 </nav>
 
 <!-- Hero -->
-<section class="hero">
-  <!-- Floating deco -->
-  <span class="deco" style="top:10%;left:6%;animation-delay:0s">🌸</span>
+<section class="hero" aria-labelledby="hero-title">
+  <span class="deco" style="top:10%;left:6%">🌸</span>
   <span class="deco" style="top:18%;right:8%;animation-delay:-1s">⭐</span>
   <span class="deco" style="bottom:22%;left:10%;animation-delay:-3s">🍡</span>
   <span class="deco" style="bottom:15%;right:12%;animation-delay:-2s">🌷</span>
   <span class="deco" style="top:40%;left:3%;animation-delay:-5s">✨</span>
   <span class="deco" style="top:35%;right:4%;animation-delay:-4s">🌸</span>
-
   <div class="hero-content">
     <p class="hero-eyebrow">AI-Generated Manga · 2024–2025</p>
-    <h1 class="hero-title">
+    <h1 class="hero-title" id="hero-title">
       <span>AI で描く</span>
       <span class="accent">漫画の世界</span>
     </h1>
@@ -215,12 +229,12 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
       <a href="#works" class="btn-pill">作品を見る</a>
       <a href="#contact" class="btn-pill btn-pill--outline">お問い合わせ</a>
     </div>
-    <div class="scroll-hint">Scroll</div>
+    <div class="scroll-hint" aria-hidden="true">Scroll</div>
   </div>
 </section>
 
 <!-- Marquee -->
-<div class="marquee-wrap">
+<div class="marquee-wrap" aria-hidden="true">
   <div class="marquee-track">
     <span class="marquee-item"><span>✦</span>AI MANGA</span>
     <span class="marquee-item"><span>✦</span>KINDLE PUBLISHED</span>
@@ -240,7 +254,7 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
 </div>
 
 <!-- Stats -->
-<section>
+<section aria-label="実績">
   <div class="container">
     <div class="stats-wrap reveal">
       <div class="stat">
@@ -260,24 +274,24 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
 </section>
 
 <!-- Characters -->
-<section id="about">
+<section id="about" aria-labelledby="chars-heading">
   <div class="container">
     <p class="section-label reveal">Characters</p>
-    <h2 class="section-title reveal">登場キャラクター</h2>
+    <h2 class="section-title reveal" id="chars-heading">登場キャラクター</h2>
     <p class="section-body reveal">季節ごとの料理や行事を一緒に体験する、物語の主役たち。</p>
     <div class="chars-grid">
       <div class="char-card reveal reveal-delay-1">
-        <div class="char-img"><img src="images/chars/pakkun.png" alt="ぱっくん"></div>
+        <div class="char-img"><img src="images/chars/pakkun.png" alt="ぱっくん — まるくて黄色い好奇心旺盛な子" loading="lazy"></div>
         <h3 class="char-name">ぱっくん</h3>
         <p class="char-desc">まるくて黄色い好奇心旺盛な子。知らないことはなんでも「なんで？」と聞く。食べることが大好き。</p>
       </div>
       <div class="char-card reveal reveal-delay-2">
-        <div class="char-img"><img src="images/chars/kiichan.png" alt="きぃちゃん"></div>
+        <div class="char-img"><img src="images/chars/kiichan.png" alt="きぃちゃん — ぱっくんのそっくりな相棒" loading="lazy"></div>
         <h3 class="char-name">きぃちゃん</h3>
         <p class="char-desc">ぱっくんのそっくりな相棒。いつも一緒に行動して、2人でわいわい騒ぐのが大好き。</p>
       </div>
       <div class="char-card reveal reveal-delay-3">
-        <div class="char-img" style="object-position:center center"><img src="images/chars/patissiere.png" alt="パティシエちゃん" style="object-position:center 20%"></div>
+        <div class="char-img"><img src="images/chars/patissiere.png" alt="パティシエちゃん — コック帽がトレードマーク" loading="lazy" style="object-position:center 20%"></div>
         <h3 class="char-name">パティシエちゃん</h3>
         <p class="char-desc">コック帽がトレードマークの女の子。季節のスイーツや料理を優しく教えてくれる頼れる存在。</p>
       </div>
@@ -286,16 +300,16 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
 </section>
 
 <!-- Works -->
-<section id="works">
+<section id="works" aria-labelledby="works-heading">
   <div class="container">
     <p class="section-label reveal">Works</p>
-    <h2 class="section-title reveal">作品シリーズ</h2>
+    <h2 class="section-title reveal" id="works-heading">作品シリーズ</h2>
     <p class="section-body reveal">季節の行事と料理をテーマに、子どもたちが楽しく学べる漫画シリーズ。</p>
     <div class="works-grid">
 
-      <div class="work-card reveal reveal-delay-1" onclick="openLightbox('winter')">
+      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" aria-label="雪あそびと冬のきせつ — クリックして詳細を見る" data-series="winter">
         <div class="work-thumb">
-          <img src="images/winter/1-1.jpg" alt="雪あそびと冬のきせつ">
+          <img src="images/winter/1-1.jpg" alt="雪あそびと冬のきせつ — 表紙" loading="lazy">
           <span class="work-badge">Kindle Vol.1</span>
         </div>
         <div class="work-body">
@@ -310,9 +324,9 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-2" onclick="openLightbox('events')">
+      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" aria-label="季節の行事とおいしいもの — クリックして詳細を見る" data-series="events">
         <div class="work-thumb">
-          <img src="images/events/新節分１.jpg" alt="季節の行事とおいしいもの">
+          <img src="images/events/setsubun-1.jpg" alt="季節の行事とおいしいもの — 節分" loading="lazy">
           <span class="work-badge">Kindle Vol.2</span>
         </div>
         <div class="work-body">
@@ -328,9 +342,9 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-3" onclick="openLightbox('sakura')">
+      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" aria-label="お花見と桜スイーツ — クリックして詳細を見る" data-series="sakura">
         <div class="work-thumb">
-          <img src="images/sakura/1.png" alt="お花見と桜スイーツ">
+          <img src="images/sakura/1.png" alt="お花見と桜スイーツ — 第1話" loading="lazy">
           <span class="work-badge">X投稿</span>
         </div>
         <div class="work-body">
@@ -351,33 +365,33 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
 </section>
 
 <!-- Featured -->
-<section style="background:var(--pink-lt)">
+<section style="background:var(--accent-lt)" aria-labelledby="featured-heading">
   <div class="container">
     <div class="featured-inner">
       <div>
         <p class="section-label reveal">Featured</p>
-        <h2 class="section-title reveal">桜ミルクプリンを<br>一緒に作ろう</h2>
+        <h2 class="section-title reveal" id="featured-heading">桜ミルクプリンを<br>一緒に作ろう</h2>
         <blockquote class="featured-quote reveal">「この葉っぱ、食べてもいいの？<br>それとも飾りのドレス？」</blockquote>
         <p class="section-body reveal">たまご君の素朴な疑問から始まるお菓子の科学。桜の塩漬けからゼラチンの不思議まで、パティシエちゃんが優しく教えてくれる全8ページ。</p>
         <a href="#works" class="btn-pill" style="margin-top:2rem;display:inline-block">作品を見る</a>
       </div>
-      <div class="featured-img reveal" style="padding:0;overflow:hidden">
-        <img src="images/sakura/3.png" alt="桜ミルクプリン" style="width:100%;height:100%;object-fit:cover">
+      <div class="featured-img reveal">
+        <img src="images/sakura/3.png" alt="桜ミルクプリンを作るパティシエちゃんとたまご君" loading="lazy">
       </div>
     </div>
   </div>
 </section>
 
-<!-- Process -->
-<section id="process">
+<!-- Process (dark) -->
+<section id="process" aria-labelledby="process-heading">
   <div class="container">
     <p class="section-label reveal">Process</p>
-    <h2 class="section-title reveal" style="color:var(--white)">AIで漫画を<br>作る流れ</h2>
+    <h2 class="section-title reveal" id="process-heading">AIで漫画を<br>作る流れ</h2>
     <div class="process-list">
       <div class="process-item reveal reveal-delay-1">
         <div class="process-num">01</div>
         <h3 class="process-name">ストーリー設計</h3>
-        <p class="process-desc">季節のテーマと学びたいことを決め、6コマ構成でセリフを設計。Claude との対話でアイデアを形にする。</p>
+        <p class="process-desc">季節のテーマと学びたいことを決め、6コマ構成でセリフを設計。Claudeとの対話でアイデアを形にする。</p>
       </div>
       <div class="process-item reveal reveal-delay-2">
         <div class="process-num">02</div>
@@ -399,13 +413,13 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
 </section>
 
 <!-- Contact -->
-<section id="contact">
+<section id="contact" aria-labelledby="contact-heading">
   <div class="container">
     <p class="section-label reveal">Contact</p>
-    <h2 class="section-title reveal">一緒に作ろう</h2>
+    <h2 class="section-title reveal" id="contact-heading">一緒に作ろう</h2>
     <p class="section-body reveal">コラボのご依頼・制作についてのご質問など、お気軽にどうぞ。</p>
     <div class="contact-actions reveal">
-      <a href="https://x.com" class="btn-pill">X でメッセージ</a>
+      <a href="https://x.com/miki_withdoux" class="btn-pill">X でメッセージ</a>
       <a href="mailto:021512miki@gmail.com" class="btn-pill btn-pill--outline">メールを送る</a>
     </div>
   </div>
@@ -418,85 +432,124 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
 </footer>
 
 <!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
-  <button class="lb-close" onclick="closeLightbox()">×</button>
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="作品ギャラリー">
+  <button class="lb-close" aria-label="閉じる">×</button>
   <div class="lb-inner" id="lb-inner"></div>
 </div>
 
 <script>
-// Loader
+// ===== LOADER =====
 window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('loader').classList.add('hidden');
   }, 2000);
 });
 
-// Scroll reveal
+// ===== SCROLL REVEAL =====
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// Lightbox
-const series = {
+// ===== MOBILE NAV =====
+const toggle = document.querySelector('.nav-toggle');
+const mobileNav = document.querySelector('.nav-mobile');
+
+toggle.addEventListener('click', () => {
+  const isOpen = mobileNav.classList.toggle('open');
+  toggle.classList.toggle('open', isOpen);
+  toggle.setAttribute('aria-expanded', String(isOpen));
+});
+
+document.querySelectorAll('.nav-mobile-link').forEach(link => {
+  link.addEventListener('click', () => {
+    mobileNav.classList.remove('open');
+    toggle.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  });
+});
+
+// ===== LIGHTBOX =====
+const SERIES = {
   winter: {
     title: '⛄ 雪あそびと冬のきせつ — Kindle Vol.1',
     pages: [
-      'images/winter/1-1.jpg',
-      'images/winter/1-2.jpg',
-      'images/winter/1-3.jpg',
-      'images/winter/1-4.jpg',
-      'images/winter/1-5.jpg',
-      'images/winter/1-6.jpg',
-      'images/winter/雪だるま.jpg',
-      'images/winter/滑り台.jpg',
+      ['images/winter/1-1.jpg', '第1話'],
+      ['images/winter/1-2.jpg', '第2話'],
+      ['images/winter/1-3.jpg', '第3話'],
+      ['images/winter/1-4.jpg', '第4話'],
+      ['images/winter/1-5.jpg', '第5話'],
+      ['images/winter/1-6.jpg', '第6話'],
+      ['images/winter/snowman.jpg', '雪だるま'],
+      ['images/winter/slide.jpg', '滑り台'],
     ]
   },
   events: {
     title: '🎂 季節の行事とおいしいもの — Kindle Vol.2',
     pages: [
-      'images/events/新節分１.jpg',
-      'images/events/新節分２.jpg',
-      'images/events/バレンタイン.jpg',
-      'images/events/ハッピーバレンタイン.jpg',
-      'images/events/チョコレート.jpg',
-      'images/events/誕生日.jpg',
-      'images/events/誕生日２.jpg',
-      'images/events/もうすぐ猫の日.jpg',
+      ['images/events/setsubun-1.jpg', '節分1'],
+      ['images/events/setsubun-2.jpg', '節分2'],
+      ['images/events/valentine.jpg', 'バレンタイン'],
+      ['images/events/happy-valentine.jpg', 'ハッピーバレンタイン'],
+      ['images/events/chocolate.jpg', 'チョコレート'],
+      ['images/events/birthday.jpg', '誕生日'],
+      ['images/events/birthday-2.jpg', '誕生日2'],
+      ['images/events/cat-day.jpg', 'もうすぐ猫の日'],
     ]
   },
   sakura: {
     title: '🌸 お花見と桜スイーツ — X投稿シリーズ',
-    pages: [
-      'images/sakura/1.png',
-      'images/sakura/2.png',
-      'images/sakura/3.png',
-      'images/sakura/4.png',
-      'images/sakura/5.png',
-      'images/sakura/6.png',
-      'images/sakura/7.png',
-      'images/sakura/8.png',
-    ]
+    pages: Array.from({length: 8}, (_, i) => [`images/sakura/${i + 1}.png`, `第${i + 1}話`])
   }
 };
 
 function openLightbox(key) {
-  const s = series[key];
-  document.getElementById('lb-inner').innerHTML = `
-    <h2 class="lb-title">${s.title}</h2>
-    <div class="lb-grid">
-      ${s.pages.map(p=>`<img src="${p}" alt="" onerror="this.parentNode.removeChild(this)">`).join('')}
-    </div>`;
-  document.getElementById('lightbox').classList.add('open');
+  const s = SERIES[key];
+  if (!s) return;
+
+  const titleEl = document.createElement('h2');
+  titleEl.className = 'lb-title';
+  titleEl.textContent = s.title;
+
+  const grid = document.createElement('div');
+  grid.className = 'lb-grid';
+
+  s.pages.forEach(([src, alt]) => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt;
+    img.loading = 'lazy';
+    img.addEventListener('error', () => img.remove());
+    grid.appendChild(img);
+  });
+
+  const inner = document.getElementById('lb-inner');
+  inner.replaceChildren(titleEl, grid);
+
+  const lb = document.getElementById('lightbox');
+  lb.classList.add('open');
   document.body.style.overflow = 'hidden';
+  document.querySelector('.lb-close').focus();
 }
-function closeLightbox(e) {
-  if (!e || e.target === document.getElementById('lightbox') || e.target.classList.contains('lb-close')) {
-    document.getElementById('lightbox').classList.remove('open');
-    document.body.style.overflow = '';
-  }
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
 }
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox({target:document.getElementById('lightbox')}); });
+
+// カードクリック / キーボード
+document.querySelectorAll('.work-card[data-series]').forEach(card => {
+  const handler = () => openLightbox(card.dataset.series);
+  card.addEventListener('click', handler);
+  card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
+});
+
+// 背景クリック・閉じるボタン
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeLightbox();
+});
+document.querySelector('.lb-close').addEventListener('click', closeLightbox);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 </script>
 </body>
 </html>
