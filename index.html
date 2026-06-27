@@ -152,13 +152,19 @@ section{padding:6rem 3rem}
 #koma .section-label{color:rgba(255,255,255,.4)}
 #koma .section-label::before{background:rgba(255,255,255,.4)}
 #koma .section-title{color:var(--white)}
-.koma-track-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;user-select:none;margin-top:2.5rem}
+.koma-track-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;user-select:none;margin-top:2.5rem;padding:0 3rem 2rem}
 .koma-track-wrap::-webkit-scrollbar{display:none}
 .koma-track-wrap.dragging{cursor:grabbing}
-.koma-track{display:flex;gap:1rem;width:max-content;padding-bottom:.5rem}
-.koma-item{flex:0 0 auto;width:min(72vw,480px);border-radius:14px;overflow:hidden;position:relative}
-.koma-item img{width:100%;height:auto;display:block;border-radius:14px}
-.koma-num{position:absolute;bottom:.75rem;right:.9rem;font-family:var(--font-display);font-size:.85rem;letter-spacing:.1em;color:rgba(255,255,255,.6)}
+.koma-track{display:flex;gap:1.5rem;width:max-content}
+.koma-ep{flex:0 0 auto;width:min(60vw,340px);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:transform .28s,box-shadow .28s}
+.koma-ep:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.koma-ep-thumb{width:100%;aspect-ratio:1/1;overflow:hidden;position:relative}
+.koma-ep-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.koma-ep:hover .koma-ep-thumb img{transform:scale(1.06)}
+.koma-ep-body{padding:1.2rem 1.4rem}
+.koma-ep-label{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.4rem}
+.koma-ep-title{font-family:var(--font-display);font-size:1.6rem;letter-spacing:.06em;color:var(--white);line-height:1.1}
+.koma-ep-count{font-size:.78rem;color:rgba(255,255,255,.35);margin-top:.4rem}
 
 /* ===== STATS ===== */
 .stats-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:4rem}
@@ -522,26 +528,85 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   // 4コマ横スクロール生成
   const komaTrack = document.getElementById('koma-track');
   if (komaTrack) {
-    for (let i = 1; i <= 21; i++) {
-      const item = document.createElement('div');
-      item.className = 'koma-item';
-      const img = document.createElement('img');
-      img.src = `images/4koma/${i}.png`;
-      img.alt = `4コマ漫画 ${i}`;
-      img.loading = 'lazy';
-      const num = document.createElement('span');
-      num.className = 'koma-num';
-      num.textContent = `${i} / 21`;
-      item.append(img, num);
-      komaTrack.appendChild(item);
+    // 1-10=第1話, 11-20=第2話, 21=第3話(制作中)
+    const PAGES_PER_EP = 10;
+    const TOTAL = 21;
+    const episodes = [];
+    for (let start = 1; start <= TOTAL; start += PAGES_PER_EP) {
+      const end = Math.min(start + PAGES_PER_EP - 1, TOTAL);
+      episodes.push({ start, end });
     }
+
+    episodes.forEach((ep, idx) => {
+      const epNum = idx + 1;
+      const pageCount = ep.end - ep.start + 1;
+      const isComplete = pageCount === PAGES_PER_EP;
+
+      const card = document.createElement('div');
+      card.className = 'koma-ep';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+
+      const thumb = document.createElement('div');
+      thumb.className = 'koma-ep-thumb';
+      const img = document.createElement('img');
+      img.src = `images/4koma/${ep.start}.png`;
+      img.alt = `第${epNum}話 表紙`;
+      img.loading = 'lazy';
+      thumb.appendChild(img);
+
+      const body = document.createElement('div');
+      body.className = 'koma-ep-body';
+      body.innerHTML = `
+        <p class="koma-ep-label">4-Panel Manga · Episode ${epNum}</p>
+        <h3 class="koma-ep-title">第${epNum}話</h3>
+        <p class="koma-ep-count">${pageCount}ページ${isComplete ? '' : '（制作中）'}</p>`;
+
+      card.append(thumb, body);
+
+      // クリックでライトボックス（縦読み）
+      const pages = [];
+      for (let p = ep.start; p <= ep.end; p++) {
+        pages.push([`images/4koma/${p}.png`, `第${epNum}話 ${p - ep.start + 1}ページ`]);
+      }
+      const handler = () => {
+        const s = { title: `第${epNum}話`, pages };
+        const titleEl = document.createElement('h2');
+        titleEl.id = 'lb-title';
+        titleEl.className = 'lb-title';
+        titleEl.textContent = s.title;
+        const scroll = document.createElement('div');
+        scroll.className = 'lb-scroll';
+        s.pages.forEach(([src, alt]) => {
+          const i = document.createElement('img');
+          i.src = src; i.alt = alt; i.loading = 'lazy';
+          scroll.appendChild(i);
+        });
+        lbInner.replaceChildren(titleEl, scroll);
+        lb.classList.add('open');
+        lb.scrollTo(0, 0);
+        document.body.style.overflow = 'hidden';
+        lbClose.focus();
+      };
+      card.addEventListener('click', handler);
+      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
+      komaTrack.appendChild(card);
+    });
+
     // ドラッグスクロール
     const wrap = komaTrack.parentElement;
-    let isDown = false, startX, scrollLeft;
-    wrap.addEventListener('mousedown', e => { isDown = true; wrap.classList.add('dragging'); startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft; });
+    let isDown = false, startX, scrollLeft, moved = false;
+    wrap.addEventListener('mousedown', e => { isDown = true; moved = false; wrap.classList.add('dragging'); startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft; });
     wrap.addEventListener('mouseleave', () => { isDown = false; wrap.classList.remove('dragging'); });
     wrap.addEventListener('mouseup', () => { isDown = false; wrap.classList.remove('dragging'); });
-    wrap.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); wrap.scrollLeft = scrollLeft - (e.pageX - wrap.offsetLeft - startX); });
+    wrap.addEventListener('mousemove', e => {
+      if (!isDown) return;
+      const dx = e.pageX - wrap.offsetLeft - startX;
+      if (Math.abs(dx) > 5) moved = true;
+      wrap.scrollLeft = scrollLeft - dx;
+    });
+    // ドラッグ中はクリックを無効化
+    wrap.addEventListener('click', e => { if (moved) { e.stopPropagation(); moved = false; } }, true);
   }
 
   // fix[S]: observer.unobserve() でメモリ解放
