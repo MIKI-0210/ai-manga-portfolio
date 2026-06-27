@@ -1,0 +1,354 @@
+# ============================================================
+# POP CREATIVE PORTFOLIO — デザインシステムプロンプト
+# 参考: rapstaz.com スタイル抽象化
+# 対象: AI生成コンテンツ / イラストレーター / クリエイター向けポートフォリオ全般
+# ============================================================
+
+meta:
+  name: "Pop Creative Portfolio"
+  version: "1.0"
+  style_keywords:
+    - "ポップ"
+    - "クリエイティブ"
+    - "夢見心地"
+    - "ミニマル"
+    - "インパクト"
+  not_suitable_for:
+    - "コーポレート・金融・法律サイト"
+    - "医療・ヘルスケア"
+    - "SaaSダッシュボード"
+
+
+# ============================================================
+# 1. COLOR SYSTEM
+# ============================================================
+colors:
+  philosophy: >
+    ほぼ白・黒の2色でベースを作り、1色のアクセントだけで世界観を表現する。
+    カラーを使いすぎない。余白と白がデザインの一部。
+
+  background:
+    primary: "#ffffff"          # ページ全体の地色 — 純白
+    secondary: "アクセント色の10〜15%薄め"  # セクション背景・カード背景に使う淡い色
+    dark: "#1a1a1a〜#000000"    # コントラストセクション（黒または限りなく黒に近い）
+
+  text:
+    primary: "#1a1a1a"          # 見出し・本文メイン — 純黒に近いが柔らかめ
+    secondary: "#888888〜#999999"  # サブテキスト・キャプション — ミディアムグレー
+    on_dark: "#ffffff"          # 暗い背景上のテキスト
+
+  accent:
+    philosophy: "1サイトに1アクセント色のみ。ブランドカラーをここに入れる"
+    usage:
+      - "大見出しの一部（2行あれば2行目をアクセント色に）"
+      - "ボーダーの細いライン"
+      - "セクション背景の超薄い版（opacity 0.08〜0.12程度）"
+      - "タグ・バッジの文字色"
+      - "カードのトップボーダーアクセント（4px）"
+    do_not_use_for:
+      - "本文テキスト全体"
+      - "ボタンの背景色（ボタンは黒か白）"
+      - "背景の大きなブロック"
+
+  gradients: "使わない。フラットカラーのみ。"
+
+
+# ============================================================
+# 2. TYPOGRAPHY
+# ============================================================
+typography:
+  philosophy: >
+    フォントはデザインそのもの。大見出しは極端に大きく・細く・インパクト重視。
+    本文は読みやすさ優先でサンセリフ。セリフは使わないかアクセントに1箇所だけ。
+
+  display_font:
+    role: "ヒーロータイトル・セクション大見出し"
+    style: "Display / Impact / Condensed系のサンセリフ"
+    google_fonts_example: "Bebas Neue / Anton / Black Han Sans"
+    weight: "400（フォント自体が太いため）"
+    size: "clamp(3rem, 10vw, 9rem) — ビューポートに応じてスケール"
+    letter_spacing: "0.02em〜0.08em"
+    line_height: "0.85〜1.0（詰める）"
+    case: "大文字混じりOK。英語部分は全大文字も可"
+
+  body_font:
+    role: "本文・説明文・ナビ"
+    style: "Geometric Sansセリフ（細め〜レギュラー）"
+    google_fonts_example: "Jost / DM Sans / Plus Jakarta Sans / Noto Sans JP（日本語混じりの場合）"
+    weight: "300〜400"
+    size: "0.82rem〜1rem"
+    line_height: "1.8〜2.0（ゆったり）"
+    letter_spacing: "0.05em〜0.15em（見出し以外）"
+
+  hierarchy:
+    eyebrow:
+      font: body_font
+      size: "0.72〜0.78rem"
+      weight: 400
+      letter_spacing: "0.2〜0.25em"
+      transform: "uppercase"
+      color: "accent または secondary text"
+      before: "短い横線（::before で width:24px の線）"
+    section_heading:
+      font: display_font
+      size: "clamp(2.5rem, 6vw, 5rem)"
+    body_text:
+      font: body_font
+      max_width: "40〜52ch"
+      color: "secondary text"
+
+  rules:
+    - "同じページに3種類以上のフォントを使わない"
+    - "日本語が入る場合はNoto Sans JP / Noto Serif JPを必ず追加"
+    - "見出しのfont-weightは300〜400。700は使わない（Bebas等は自体が太いため）"
+
+
+# ============================================================
+# 3. LAYOUT & SPACING
+# ============================================================
+layout:
+  philosophy: >
+    「余白がコンテンツ」。詰め込まない。各セクションに十分な呼吸をさせる。
+    シングルページ縦スクロールが基本構成。
+
+  page_width: "max-width: 1200px（コンテナ）"
+  section_padding: "6rem 3rem（デスクトップ）/ 4rem 1.5rem（モバイル）"
+  grid:
+    2col: "50/50 または 60/40 非対称分割"
+    3col: "カード・キャラクター等の並列表示"
+    4col: "プロセス・ステップ表示"
+    breakpoint: "900px以下で1列に落とす"
+
+  section_rhythm:
+    order: "Hero → Marquee帯 → Stats → 本コンテンツ → Featured → Dark背景セクション → Contact → Footer"
+    alternating_bg: "白 → 白 → アクセント薄 → 白 → 黒 → アクセント薄 → 黒 の交互"
+
+  hero:
+    height: "100vh"
+    content_alignment: "center（テキスト中央寄せ）"
+    background: "アクセント色の15%薄め"
+    floating_elements: "装飾要素（絵文字・SVGアイコン等）を背景に浮遊させる"
+
+
+# ============================================================
+# 4. COMPONENTS
+# ============================================================
+components:
+
+  nav:
+    position: "fixed top"
+    background: "rgba(255,255,255,0.92) + backdrop-filter: blur(12px)"
+    logo: "Display fontで大きめ / ブランドロゴ"
+    links: "uppercase + 広い letter-spacing + border-bottom hover"
+    cta: "黒背景のピルボタン"
+    blend: "mix-blend-mode: multiply でコンテンツに自然に溶け込む"
+
+  buttons:
+    primary:
+      style: "ピル型（border-radius: 100px）"
+      bg: "#1a1a1a（黒）"
+      color: "#ffffff"
+      padding: "0.85rem 2.5rem"
+      hover: "transform: scale(1.04) / background少し明るく"
+    secondary:
+      style: "ピル型アウトライン"
+      border: "1.5px solid #1a1a1a"
+      bg: "transparent"
+      hover: "背景を黒に / 文字を白に"
+    do_not_use: "角ばったボタン / グラデーションボタン"
+
+  cards:
+    border_radius: "16px"
+    border: "1px solid #e8e8e8"
+    hover: "translateY(-6px〜-8px) + box-shadow強調"
+    top_accent: "border-top: 4px solid アクセント色（キャラクターカードなど）"
+    image_area:
+      height: "260〜280px"
+      bg: "グラデーション（アクセント色 → 薄黄色 等2色のみ）"
+      hover_zoom: "transform: scale(1.04〜1.06)"
+    badge:
+      position: "absolute top-right"
+      style: "背景黒 / 文字白 / border-radius: 100px"
+      size: "0.68rem"
+
+  marquee:
+    role: "セクション間の区切り兼ブランディング"
+    content: "キーワードを ✦ で区切って横スクロール"
+    font: display_font
+    color: secondary text
+    animation: "linear infinite 20〜25s"
+    border: "上下に1px border"
+
+  stats:
+    layout: "3〜4列グリッド / 間に1pxボーダー"
+    number_font: display_font
+    number_size: "4〜5rem"
+    label: "uppercase / 0.78rem / letter-spacing広め"
+    unit_color: "アクセント色"
+
+  floating_decorations:
+    role: "ヒーローや背景に生き生きとした雰囲気を追加"
+    types:
+      - "ブランドに関連した絵文字 or SVGイラスト"
+      - "星・花・キラキラ等の汎用デコ"
+    animation: "translateY + rotate の組み合わせ / 6〜8s ease-in-out infinite"
+    placement: "position:absolute / 四隅や余白スペースに散らす"
+    sizes: "1.5rem〜2rem（控えめに）"
+
+  lightbox:
+    trigger: "作品カードクリック"
+    overlay: "rgba(0,0,0,0.9)"
+    content: "白背景 / border-radius:20px / 最大幅900px"
+    close: "position:fixed top-right / 白×文字"
+    inner_grid: "2列グリッドで作品画像を並べる"
+
+  scroll_reveal:
+    class: ".reveal（初期: opacity:0 + translateY:40px）"
+    trigger: "IntersectionObserver threshold:0.1"
+    transition: "opacity .7s ease, transform .7s ease"
+    stagger: "子要素に transition-delay: 0.1s / 0.2s / 0.3s"
+
+  scroll_indicator:
+    text: "SCROLL（uppercase / 超小さい）"
+    line: "::after で 1px × 48px の縦線アニメーション"
+    animation: "scaleY 0→1→0 をtransform-originを切り替えてループ"
+
+
+# ============================================================
+# 5. ANIMATION SYSTEM
+# ============================================================
+animations:
+  philosophy: "動きは「生き生き感」のため。過剰にしない。目的を持って使う"
+
+  loader:
+    trigger: "ページ初回ロード"
+    content: "NOW LOADING / サイト名 / プログレスバー"
+    font: display_font
+    duration: "1.8〜2.5秒後に opacity:0 + visibility:hidden"
+    bg: "白背景（コンテンツと同じ背景色）"
+
+  hover:
+    cards: "translateY(-6px) + box-shadow 280ms ease"
+    buttons: "scale(1.04) 200ms ease"
+    nav_links: "border-bottom-color 200ms ease"
+    images: "scale(1.04〜1.06) 500ms ease（内部の画像のみ）"
+
+  scroll_based:
+    type: "IntersectionObserver によるクラス付与"
+    initial_state: "opacity:0 + translateY:40px"
+    active_state: "opacity:1 + translateY:0"
+    easing: "ease"
+    duration: "0.7s"
+
+  floating:
+    type: "CSS @keyframes"
+    motion: "translateY(0 → -18px → 0) + rotate(0 → 8deg → 0)"
+    duration: "6〜8s"
+    easing: "ease-in-out"
+    variation: "各要素に異なる duration / delay を指定してバラつかせる"
+
+  marquee:
+    type: "translateX(0 → -50%) infinite linear"
+    duration: "20〜25s"
+    content_duplication: "要素を2セット並べてシームレスにループ"
+
+  transitions:
+    default: "280ms ease"
+    slow: "500ms ease（画像ズーム等）"
+    page_elements: "変化は常に ease / ease-in-out。linear は marquee のみ"
+
+
+# ============================================================
+# 6. SECTION PATTERNS
+# ============================================================
+section_patterns:
+
+  hero_centered:
+    bg: "アクセント色の超薄版"
+    layout: "中央揃えテキスト + 浮遊デコ"
+    title: "Display font / 2行 / 1行目:黒 / 2行目:アクセント色"
+    scroll_cta: "SCROLL テキスト + 縦線アニメーション"
+
+  marquee_divider:
+    purpose: "セクション区切り兼ブランドキーワード訴求"
+    always_include: true
+
+  stats_row:
+    columns: 3
+    purpose: "実績数値を一瞬で伝える"
+    place: "Hero直後が効果的"
+
+  card_grid:
+    columns: 3
+    purpose: "作品・シリーズ・サービス一覧"
+    interaction: "クリックでライトボックス or 詳細ページ"
+
+  feature_split:
+    ratio: "60:40 または 50:50"
+    purpose: "代表作をストーリーと共に見せる"
+    quote: "セリフや印象的なコピーをborderquoteスタイルで左ボーダー付き表示"
+
+  dark_section:
+    bg: "#1a1a1a"
+    text: "白"
+    purpose: "プロセス・技術スタック・料金など情報密度の高いコンテンツ"
+    accent: "薄いアクセント色のラインやナンバー"
+
+  contact_cta:
+    bg: "アクセント色の薄版"
+    layout: "中央揃え"
+    title: "Display font / 大きく / 行動を促すコピー"
+    buttons: "黒 + アウトラインの2択"
+
+
+# ============================================================
+# 7. MOOD & VOICE
+# ============================================================
+mood:
+  overall: "夢見心地でポップ。でも安っぽくない。余白と黒でバランスを取る"
+  energy: "高め。動きがある。ワクワクさせる"
+  sophistication: "中〜高。色を絞ることで安っぽさを防ぐ"
+  friendliness: "高。装飾要素や丸みでキャラクターが伝わる"
+  keywords:
+    - "DREAMY（夢見心地）"
+    - "POP（明るく親しみやすい）"
+    - "BOLD（大胆なタイポグラフィ）"
+    - "MINIMAL COLOR（色を絞る）"
+    - "PLAYFUL（浮遊デコ・アニメ）"
+    - "CONFIDENT（余白を恐れない）"
+
+  anti_patterns:
+    - "グラデーション多用 → ビジネス感が出る"
+    - "丸角を全て同じにする → 個性が消える"
+    - "色をたくさん使う → 安っぽくなる"
+    - "アニメーションを入れすぎる → 酔う"
+    - "フォントを3種類以上 → まとまりがなくなる"
+
+
+# ============================================================
+# 8. CLAUDE PROMPT TEMPLATE（このYAMLの使い方）
+# ============================================================
+usage_prompt: |
+  以下のデザインシステム（pop-creative-portfolio.yaml）を参照してHTMLを作成してください。
+
+  ## 適用するサイトの概要
+  [ここにサイトの目的・コンテンツを書く]
+
+  ## アクセント色
+  [ブランドカラーのHEX値を1色だけ指定]
+
+  ## デザイン指示
+  - pop-creative-portfolio.yaml の colors / typography / components / animations を忠実に適用
+  - ローダー演出（2秒）を必ず入れる
+  - Hero はフローティングデコ付き中央揃えレイアウト
+  - マーキー帯をHeroとStatsの間に入れる
+  - スクロールリベール（.reveal クラス + IntersectionObserver）を全セクションに適用
+  - ボタンはピル型のみ（角ばったボタン禁止）
+  - カードは border-radius:16px / hover で translateY(-8px)
+  - 黒背景セクションを最低1つ入れる
+
+  ## 禁止事項
+  - グラデーション背景
+  - アクセント色以外の色の追加
+  - font-weight 700以上
+  - box-shadowの多用（hover時のみ）
