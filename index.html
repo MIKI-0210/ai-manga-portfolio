@@ -367,7 +367,6 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         <div class="work-thumb">
           <img src="images/winter/1-1.jpg" alt="" loading="lazy">
           <span class="work-num">01</span>
-          <span class="work-badge">Kindle Vol.1</span>
         </div>
         <div class="work-body">
           <p class="work-label">Winter · 8ページ</p>
@@ -381,7 +380,6 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         <div class="work-thumb">
           <img src="images/events/setsubun-1.jpg" alt="" loading="lazy">
           <span class="work-num">02</span>
-          <span class="work-badge">Kindle Vol.2</span>
         </div>
         <div class="work-body">
           <p class="work-label">Events · 2ページ</p>
@@ -395,7 +393,6 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         <div class="work-thumb">
           <img src="images/events/valentine.jpg" alt="" loading="lazy">
           <span class="work-num">03</span>
-          <span class="work-badge">Kindle Vol.2</span>
         </div>
         <div class="work-body">
           <p class="work-label">Events · 3ページ</p>
@@ -409,7 +406,6 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         <div class="work-thumb">
           <img src="images/events/birthday.jpg" alt="" loading="lazy">
           <span class="work-num">04</span>
-          <span class="work-badge">Kindle Vol.2</span>
         </div>
         <div class="work-body">
           <p class="work-label">Events · 2ページ</p>
@@ -423,7 +419,6 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         <div class="work-thumb">
           <img src="images/events/cat-day.jpg" alt="" loading="lazy">
           <span class="work-num">05</span>
-          <span class="work-badge">Kindle Vol.2</span>
         </div>
         <div class="work-body">
           <p class="work-label">Events · 1ページ</p>
@@ -437,7 +432,6 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
         <div class="work-thumb">
           <img src="images/sakura/1.png" alt="" loading="lazy">
           <span class="work-num">06</span>
-          <span class="work-badge">X投稿</span>
         </div>
         <div class="work-body">
           <p class="work-label">Spring · 21ページ</p>
@@ -597,8 +591,6 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
       const body = document.createElement('div');
       body.className = 'koma-ep-body';
       body.innerHTML = `
-        <p class="koma-ep-label">4-Panel Manga · Episode ${epNum}</p>
-        <h3 class="koma-ep-title">第${epNum}話</h3>
         <p class="koma-ep-count">${pageCount}ページ${isComplete ? '' : '（制作中）'}</p>`;
 
       card.append(thumb, body);
