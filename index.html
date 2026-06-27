@@ -147,20 +147,28 @@ section{padding:6rem 3rem}
 /* fix[W]: インラインスタイルをクラスに統一 */
 .reveal-delay-4{transition-delay:.4s}
 
-/* ===== STORIES ===== */
-#koma{background:var(--white)}
-.koma-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
-.koma-ep{border-radius:16px;overflow:hidden;background:var(--white);border:1px solid var(--border);cursor:pointer;transition:transform .28s,box-shadow .28s}
-.koma-ep:hover{transform:translateY(-8px);box-shadow:0 24px 64px rgba(0,0,0,.1)}
+/* ===== WORK NUMBER OVERLAY ===== */
+.work-num{position:absolute;bottom:.8rem;left:1rem;font-family:var(--font-display);font-size:5rem;line-height:1;color:rgba(255,255,255,.75);text-shadow:0 2px 16px rgba(0,0,0,.25);pointer-events:none}
+
+/* ===== 4KOMA SCROLL ===== */
+#koma{background:var(--ink);overflow:hidden}
+#koma .section-label{color:rgba(255,255,255,.4)}
+#koma .section-label::before{background:rgba(255,255,255,.4)}
+#koma .section-title{color:var(--white)}
+.koma-track-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;user-select:none;margin-top:2.5rem;padding:0 3rem 2rem}
+.koma-track-wrap::-webkit-scrollbar{display:none}
+.koma-track-wrap.dragging{cursor:grabbing}
+.koma-track{display:flex;gap:1.5rem;width:max-content}
+.koma-ep{flex:0 0 auto;width:min(60vw,300px);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:transform .28s,box-shadow .28s}
+.koma-ep:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
 .koma-ep-thumb{width:100%;aspect-ratio:3/4;overflow:hidden;position:relative}
 .koma-ep-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
 .koma-ep:hover .koma-ep-thumb img{transform:scale(1.06)}
-.koma-ep-num{position:absolute;top:1rem;left:1rem;font-family:var(--font-display);font-size:3.5rem;line-height:1;color:rgba(255,255,255,.9);text-shadow:0 2px 12px rgba(0,0,0,.3)}
-.koma-ep-body{padding:1.2rem 1.4rem 1.5rem}
-.koma-ep-label{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
-.koma-ep-title{font-family:var(--font-display);font-size:1.8rem;letter-spacing:.06em;color:var(--ink);line-height:1.1}
-.koma-ep-count{font-size:.78rem;color:var(--muted);margin-top:.4rem}
-@media(max-width:900px){.koma-grid{grid-template-columns:repeat(2,1fr)}}
+.koma-ep-num{position:absolute;bottom:.8rem;left:1rem;font-family:var(--font-display);font-size:3.5rem;line-height:1;color:rgba(255,255,255,.7);text-shadow:0 2px 12px rgba(0,0,0,.3)}
+.koma-ep-body{padding:1rem 1.2rem 1.2rem}
+.koma-ep-label{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.35rem}
+.koma-ep-title{font-family:var(--font-display);font-size:1.4rem;letter-spacing:.06em;color:var(--white);line-height:1.1}
+.koma-ep-count{font-size:.75rem;color:rgba(255,255,255,.3);margin-top:.3rem}
 
 /* ===== STATS ===== */
 .stats-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:4rem}
@@ -355,55 +363,86 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
     </div>
     <div class="works-grid">
 
-      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" aria-label="雪あそびと冬のきせつ — クリックして詳細を見る" data-series="winter">
+      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" data-series="winter">
         <div class="work-thumb">
-          <img src="images/winter/1-1.jpg" alt="雪あそびと冬のきせつ — 表紙" loading="lazy">
+          <img src="images/winter/1-1.jpg" alt="" loading="lazy">
+          <span class="work-num">01</span>
           <span class="work-badge">Kindle Vol.1</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Season · Winter</p>
-          <h3 class="work-title">雪あそびと冬のきせつ</h3>
-          <p class="work-desc">雪だるま、滑り台、雪の結晶——たまご君たちの冬の冒険。本編6話＋番外2作。</p>
+          <p class="work-label">Winter · 8ページ</p>
           <div class="work-tags">
-            <span class="tag">Kindle出版</span>
-            <span class="tag">雪遊び</span>
-            <span class="tag">クリスマス</span>
+            <span class="tag">雪遊び</span><span class="tag">冬</span>
           </div>
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" aria-label="季節の行事とおいしいもの — クリックして詳細を見る" data-series="events">
+      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" data-series="setsubun">
         <div class="work-thumb">
-          <img src="images/events/setsubun-1.jpg" alt="季節の行事とおいしいもの — 節分" loading="lazy">
+          <img src="images/events/setsubun-1.jpg" alt="" loading="lazy">
+          <span class="work-num">02</span>
           <span class="work-badge">Kindle Vol.2</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Season · Events</p>
-          <h3 class="work-title">季節の行事とおいしいもの</h3>
-          <p class="work-desc">節分・バレンタイン・誕生日・猫の日——年中行事を料理と一緒に楽しむ全8話。</p>
+          <p class="work-label">Events · 2ページ</p>
           <div class="work-tags">
-            <span class="tag">Kindle出版</span>
-            <span class="tag">節分</span>
-            <span class="tag">バレンタイン</span>
-            <span class="tag">誕生日</span>
+            <span class="tag">節分</span><span class="tag">恵方巻</span>
           </div>
         </div>
       </div>
 
-      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" aria-label="お花見と桜スイーツ — クリックして詳細を見る" data-series="sakura">
+      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" data-series="valentine">
         <div class="work-thumb">
-          <img src="images/sakura/1.png" alt="お花見と桜スイーツ — 第1話" loading="lazy">
+          <img src="images/events/valentine.jpg" alt="" loading="lazy">
+          <span class="work-num">03</span>
+          <span class="work-badge">Kindle Vol.2</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">Events · 3ページ</p>
+          <div class="work-tags">
+            <span class="tag">バレンタイン</span><span class="tag">チョコ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" data-series="birthday">
+        <div class="work-thumb">
+          <img src="images/events/birthday.jpg" alt="" loading="lazy">
+          <span class="work-num">04</span>
+          <span class="work-badge">Kindle Vol.2</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">Events · 2ページ</p>
+          <div class="work-tags">
+            <span class="tag">誕生日</span><span class="tag">ケーキ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="work-card reveal reveal-delay-2" role="button" tabindex="0" data-series="catday">
+        <div class="work-thumb">
+          <img src="images/events/cat-day.jpg" alt="" loading="lazy">
+          <span class="work-num">05</span>
+          <span class="work-badge">Kindle Vol.2</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">Events · 1ページ</p>
+          <div class="work-tags">
+            <span class="tag">猫の日</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="work-card reveal reveal-delay-3" role="button" tabindex="0" data-series="sakura">
+        <div class="work-thumb">
+          <img src="images/sakura/1.png" alt="" loading="lazy">
+          <span class="work-num">06</span>
           <span class="work-badge">X投稿</span>
         </div>
         <div class="work-body">
-          <p class="work-label">Season · Spring</p>
-          <h3 class="work-title">お花見と桜スイーツ</h3>
-          <p class="work-desc">お花見ピクニック→桜の葉の塩漬けの秘密→桜ミルクプリン作り。春の全21ページ。</p>
+          <p class="work-label">Spring · 21ページ</p>
           <div class="work-tags">
-            <span class="tag">X投稿</span>
-            <span class="tag">桜</span>
-            <span class="tag">お花見</span>
-            <span class="tag">スイーツ</span>
+            <span class="tag">お花見</span><span class="tag">桜スイーツ</span>
           </div>
         </div>
       </div>
@@ -412,14 +451,14 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   </div>
 </section>
 
-<!-- ストーリー一覧 -->
+<!-- 4コマ横スクロール -->
 <section id="koma" aria-labelledby="koma-heading">
   <div class="container">
-    <p class="section-label reveal">Stories</p>
+    <p class="section-label reveal">4-Panel Manga</p>
     <h2 class="section-title reveal" id="koma-heading">4コマ漫画</h2>
-    <div class="koma-grid" id="koma-track">
-      <!-- JS で生成 -->
-    </div>
+  </div>
+  <div class="koma-track-wrap reveal">
+    <div class="koma-track" id="koma-track"><!-- JS で生成 --></div>
   </div>
 </section>
 
@@ -593,6 +632,14 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
       komaTrack.appendChild(card);
     });
 
+    // ドラッグスクロール
+    const wrap = komaTrack.parentElement;
+    let isDown = false, startX, scrollLeft, moved = false;
+    wrap.addEventListener('mousedown', e => { isDown = true; moved = false; wrap.classList.add('dragging'); startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft; });
+    wrap.addEventListener('mouseleave', () => { isDown = false; wrap.classList.remove('dragging'); });
+    wrap.addEventListener('mouseup', () => { isDown = false; wrap.classList.remove('dragging'); });
+    wrap.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const dx = e.pageX - wrap.offsetLeft - startX; if (Math.abs(dx) > 5) moved = true; wrap.scrollLeft = scrollLeft - dx; });
+    wrap.addEventListener('click', e => { if (moved) { e.stopPropagation(); moved = false; } }, true);
   }
 
   // fix[S]: observer.unobserve() でメモリ解放
@@ -641,34 +688,42 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
   // SERIES の値は全てハードコード。外部入力を src に代入しないこと。
   const SERIES = {
     winter: {
-      title: '⛄ 雪あそびと冬のきせつ — Kindle Vol.1',
+      title: '01',
       pages: [
-        ['images/winter/1-1.jpg', '第1話'],
-        ['images/winter/1-2.jpg', '第2話'],
-        ['images/winter/1-3.jpg', '第3話'],
-        ['images/winter/1-4.jpg', '第4話'],
-        ['images/winter/1-5.jpg', '第5話'],
-        ['images/winter/1-6.jpg', '第6話'],
-        ['images/winter/snowman.jpg', '雪だるま'],
-        ['images/winter/slide.jpg', '滑り台'],
+        ['images/winter/1-1.jpg', 'p1'],['images/winter/1-2.jpg', 'p2'],
+        ['images/winter/1-3.jpg', 'p3'],['images/winter/1-4.jpg', 'p4'],
+        ['images/winter/1-5.jpg', 'p5'],['images/winter/1-6.jpg', 'p6'],
+        ['images/winter/snowman.jpg', 'p7'],['images/winter/slide.jpg', 'p8'],
       ]
     },
-    events: {
-      title: '🎂 季節の行事とおいしいもの — Kindle Vol.2',
+    setsubun: {
+      title: '02',
       pages: [
-        ['images/events/setsubun-1.jpg', '節分1'],
-        ['images/events/setsubun-2.jpg', '節分2'],
-        ['images/events/valentine.jpg', 'バレンタイン'],
-        ['images/events/happy-valentine.jpg', 'ハッピーバレンタイン'],
-        ['images/events/chocolate.jpg', 'チョコレート'],
-        ['images/events/birthday.jpg', '誕生日'],
-        ['images/events/birthday-2.jpg', '誕生日2'],
-        ['images/events/cat-day.jpg', 'もうすぐ猫の日'],
+        ['images/events/setsubun-1.jpg', 'p1'],['images/events/setsubun-2.jpg', 'p2'],
+      ]
+    },
+    valentine: {
+      title: '03',
+      pages: [
+        ['images/events/valentine.jpg', 'p1'],['images/events/happy-valentine.jpg', 'p2'],
+        ['images/events/chocolate.jpg', 'p3'],
+      ]
+    },
+    birthday: {
+      title: '04',
+      pages: [
+        ['images/events/birthday.jpg', 'p1'],['images/events/birthday-2.jpg', 'p2'],
+      ]
+    },
+    catday: {
+      title: '05',
+      pages: [
+        ['images/events/cat-day.jpg', 'p1'],
       ]
     },
     sakura: {
-      title: '🌸 お花見と桜スイーツ — X投稿シリーズ',
-      pages: Array.from({ length: 21 }, (_, i) => [`images/sakura/${i + 1}.png`, `第${i + 1}ページ`])
+      title: '06',
+      pages: Array.from({ length: 21 }, (_, i) => [`images/sakura/${i + 1}.png`, `p${i + 1}`])
     }
   };
 
