@@ -106,9 +106,13 @@ section{padding:6rem 3rem}
 .char-desc{font-size:.85rem;color:var(--muted);line-height:1.8}
 
 /* ===== WORKS ===== */
-/* fix[S]: 背景色を CSS 変数化 */
 #works{background:var(--bg-subtle)}
-.works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem}
+.filter-bar{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:2.5rem}
+.filter-btn{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem 1.4rem;border-radius:100px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.filter-btn:hover{border-color:var(--ink);color:var(--ink)}
+.filter-btn.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:1.5rem}
+.work-card.hidden{display:none}
 .work-card{border-radius:16px;overflow:hidden;background:var(--white);border:1px solid var(--border);cursor:pointer;transition:transform .28s,box-shadow .28s;position:relative}
 .work-card:hover{transform:translateY(-8px);box-shadow:0 24px 64px rgba(0,0,0,.1)}
 /* fix[W]: フォーカスリング追加 */
@@ -328,6 +332,12 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
     <p class="section-label reveal">Works</p>
     <h2 class="section-title reveal" id="works-heading">作品シリーズ</h2>
     <p class="section-body reveal">季節の行事と料理をテーマに、子どもたちが楽しく学べる漫画シリーズ。</p>
+    <div class="filter-bar reveal">
+      <button class="filter-btn active" data-filter="all">すべて</button>
+      <button class="filter-btn" data-filter="winter">❄️ Winter</button>
+      <button class="filter-btn" data-filter="events">🎂 Events</button>
+      <button class="filter-btn" data-filter="sakura">🌸 Spring</button>
+    </div>
     <div class="works-grid">
 
       <div class="work-card reveal reveal-delay-1" role="button" tabindex="0" aria-label="雪あそびと冬のきせつ — クリックして詳細を見る" data-series="winter">
@@ -493,6 +503,19 @@ footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,2
     });
   }, { threshold: 0.1 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // タグフィルター
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.work-card').forEach(card => {
+        const match = filter === 'all' || card.dataset.series === filter;
+        card.classList.toggle('hidden', !match);
+      });
+    });
+  });
 
   // fix[S]: null ガード付きモバイルナビ
   const toggle = document.querySelector('.nav-toggle');
