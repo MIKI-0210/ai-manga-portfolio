@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Manga Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1a1a;
+  --muted:#888;
+  --pink:#f4a7b9;
+  --pink-lt:#fef0f4;
+  --yellow:#ffd580;
+  --green:#b8ddb0;
+  --border:#e8e8e8;
+  --white:#ffffff;
+  --font-display:'Bebas Neue',sans-serif;
+  --font-body:'Noto Sans JP',sans-serif;
+  --font-serif:'Noto Serif JP',serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--ink);background:var(--white);overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ===== LOADER ===== */
+#loader{position:fixed;inset:0;background:var(--white);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,visibility .6s ease}
+#loader.hidden{opacity:0;visibility:hidden}
+.loader-text{font-family:var(--font-display);font-size:clamp(2rem,8vw,5rem);letter-spacing:.15em;color:var(--ink);animation:pulse 1.2s ease-in-out infinite}
+.loader-sub{font-size:.75rem;letter-spacing:.25em;color:var(--muted);margin-top:.75rem;text-transform:uppercase}
+.loader-bar{width:200px;height:2px;background:var(--border);margin-top:2rem;border-radius:2px;overflow:hidden}
+.loader-bar-fill{height:100%;background:var(--ink);animation:load 1.8s ease forwards}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes load{0%{width:0}100%{width:100%}}
+
+/* ===== DECO ELEMENTS ===== */
+.deco{position:absolute;pointer-events:none;user-select:none;font-size:1.6rem;animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-18px) rotate(8deg)}}
+.deco:nth-child(2n){animation-duration:8s;animation-delay:-2s}
+.deco:nth-child(3n){animation-duration:7s;animation-delay:-4s}
+
+/* ===== NAV ===== */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;mix-blend-mode:multiply}
+.nav-logo{font-family:var(--font-display);font-size:1.5rem;letter-spacing:.1em}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink);border-bottom:1px solid transparent;transition:border-color .2s}
+.nav-links a:hover{border-bottom-color:var(--ink)}
+
+/* ===== HERO ===== */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--pink-lt);padding:7rem 3rem 5rem}
+.hero-content{text-align:center;position:relative;z-index:2}
+.hero-eyebrow{font-size:.78rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
+.hero-title{font-family:var(--font-display);font-size:clamp(4rem,12vw,10rem);line-height:.9;letter-spacing:.04em;margin-bottom:2rem}
+.hero-title span{display:block}
+.hero-title .accent{color:var(--pink);-webkit-text-stroke:2px var(--pink)}
+.hero-body{font-size:1rem;color:var(--muted);line-height:1.85;max-width:40ch;margin:0 auto 2.5rem}
+.btn-pill{display:inline-block;background:var(--ink);color:var(--white);font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;padding:.85rem 2.5rem;border-radius:100px;transition:transform .2s,background .2s}
+.btn-pill:hover{transform:scale(1.04);background:#333}
+.btn-pill--outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink);margin-left:1rem}
+.btn-pill--outline:hover{background:var(--ink);color:var(--white)}
+.scroll-hint{margin-top:4rem;font-size:.72rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.scroll-hint::after{content:'';display:block;width:1px;height:48px;background:var(--muted);animation:scrolldown 1.5s ease-in-out infinite}
+@keyframes scrolldown{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ===== MARQUEE ===== */
+.marquee-wrap{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:.75rem 0;background:var(--white)}
+.marquee-track{display:flex;gap:3rem;animation:marquee 20s linear infinite;white-space:nowrap}
+.marquee-item{font-family:var(--font-display);font-size:1.1rem;letter-spacing:.1em;color:var(--muted);flex-shrink:0}
+.marquee-item span{color:var(--pink);margin-right:1rem}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ===== SECTION ===== */
+section{padding:6rem 3rem}
+.container{max-width:1200px;margin:0 auto}
+.section-label{font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.75rem}
+.section-label::before{content:'';display:block;width:24px;height:1px;background:var(--muted)}
+.section-title{font-family:var(--font-display);font-size:clamp(2.5rem,6vw,5rem);line-height:1;margin-bottom:1.5rem}
+.section-body{font-size:.95rem;color:var(--muted);line-height:1.9;max-width:48ch}
+
+/* ===== CHARS ===== */
+.chars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem}
+.char-card{background:var(--white);border:1px solid var(--border);padding:2.5rem 2rem;border-radius:16px;text-align:center;transition:transform .3s,box-shadow .3s;position:relative;overflow:hidden}
+.char-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--pink),var(--yellow))}
+.char-card:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.08)}
+.char-icon{font-size:4rem;margin-bottom:1.5rem;display:block}
+.char-img{width:180px;height:180px;border-radius:50%;overflow:hidden;margin:0 auto 1.5rem;border:3px solid var(--pink);background:linear-gradient(180deg,#7ec8e3 0%,#a8ddf0 40%,#c8eef8 70%,#e0f6ff 100%);position:relative;box-shadow:0 4px 20px rgba(126,200,227,.35)}
+.char-img::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 70px 28px at 30% 22%,rgba(255,255,255,.85) 0%,rgba(255,255,255,.5) 50%,transparent 70%),radial-gradient(ellipse 50px 22px at 62% 18%,rgba(255,255,255,.8) 0%,rgba(255,255,255,.4) 50%,transparent 70%),radial-gradient(ellipse 38px 16px at 78% 30%,rgba(255,255,255,.75) 0%,transparent 65%);pointer-events:none;z-index:1}
+.char-img img{width:100%;height:100%;object-fit:contain;object-position:center bottom;position:relative;z-index:2;padding:4px 4px 0}
+.char-name{font-family:var(--font-display);font-size:2rem;letter-spacing:.06em;margin-bottom:.75rem}
+.char-desc{font-size:.85rem;color:var(--muted);line-height:1.8}
+
+/* ===== WORKS ===== */
+#works{background:#fafafa}
+.works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem}
+.work-card{border-radius:16px;overflow:hidden;background:var(--white);border:1px solid var(--border);cursor:pointer;transition:transform .3s,box-shadow .3s;position:relative}
+.work-card:hover{transform:translateY(-8px);box-shadow:0 24px 64px rgba(0,0,0,.1)}
+.work-thumb{aspect-ratio:3/4;position:relative;overflow:hidden}
+.work-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:4rem;background:linear-gradient(135deg,var(--pink-lt),var(--yellow))}
+.work-thumb-placeholder.green{background:linear-gradient(135deg,#e8f5e4,var(--green))}
+.work-thumb-placeholder.blue{background:linear-gradient(135deg,#e8f0fe,#b8d0f8)}
+.work-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.work-card:hover .work-thumb img{transform:scale(1.06)}
+.work-badge{position:absolute;top:1rem;right:1rem;background:var(--ink);color:var(--white);font-size:.68rem;letter-spacing:.1em;padding:.3rem .9rem;border-radius:100px;text-transform:uppercase}
+.work-body{padding:1.5rem}
+.work-label{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.work-title{font-family:var(--font-display);font-size:1.6rem;letter-spacing:.04em;margin-bottom:.75rem;line-height:1.2}
+.work-desc{font-size:.82rem;color:var(--muted);line-height:1.75;margin-bottom:1.25rem}
+.work-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.tag{font-size:.68rem;letter-spacing:.08em;padding:.2rem .7rem;border:1px solid var(--border);border-radius:100px;color:var(--muted)}
+
+/* ===== FEATURED ===== */
+.featured-inner{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.featured-img{border-radius:24px;overflow:hidden;height:480px;background:linear-gradient(135deg,var(--pink-lt),var(--yellow));display:flex;align-items:center;justify-content:center;font-size:6rem}
+.featured-quote{font-family:var(--font-serif);font-size:1.4rem;font-weight:300;line-height:1.7;color:var(--ink);margin:2rem 0;padding-left:1.5rem;border-left:3px solid var(--pink)}
+
+/* ===== PROCESS ===== */
+#process{background:var(--ink);color:var(--white)}
+#process .section-label{color:rgba(255,255,255,.4)}
+#process .section-label::before{background:rgba(255,255,255,.4)}
+#process .section-title{color:var(--white)}
+.process-list{margin-top:4rem;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
+.process-item{border-top:1px solid rgba(255,255,255,.15);padding-top:2rem}
+.process-num{font-family:var(--font-display);font-size:4rem;color:rgba(255,255,255,.12);line-height:1;margin-bottom:1rem}
+.process-name{font-size:.95rem;font-weight:500;margin-bottom:.75rem;color:var(--white)}
+.process-desc{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.8}
+
+/* ===== STATS ===== */
+.stats-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:4rem}
+.stat{background:var(--white);padding:3rem 2rem;text-align:center}
+.stat-num{font-family:var(--font-display);font-size:4.5rem;line-height:1;color:var(--ink)}
+.stat-unit{font-family:var(--font-display);font-size:2rem;color:var(--pink)}
+.stat-label{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.5rem}
+
+/* ===== CONTACT ===== */
+#contact{background:var(--pink-lt);text-align:center}
+#contact .section-label{justify-content:center}
+#contact .section-label::before{display:none}
+#contact .section-title{font-size:clamp(3rem,8vw,7rem)}
+#contact .section-body{margin:0 auto 3rem}
+.contact-actions{display:flex;justify-content:center;gap:1rem}
+
+/* ===== FOOTER ===== */
+footer{background:var(--ink);color:rgba(255,255,255,.35);padding:2rem 3rem;display:flex;justify-content:space-between;align-items:center;font-size:.75rem;letter-spacing:.1em}
+footer .f-logo{font-family:var(--font-display);font-size:1.2rem;color:rgba(255,255,255,.6);letter-spacing:.1em}
+
+/* ===== LIGHTBOX ===== */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.lightbox.open{opacity:1;pointer-events:all}
+.lb-inner{background:var(--white);border-radius:20px;max-width:900px;width:90%;max-height:88vh;overflow-y:auto;padding:2.5rem}
+.lb-close{position:fixed;top:1.5rem;right:2rem;font-size:2.5rem;color:var(--white);cursor:pointer;line-height:1;background:none;border:none;font-family:sans-serif}
+.lb-title{font-family:var(--font-display);font-size:2rem;letter-spacing:.06em;margin-bottom:1.5rem}
+.lb-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.lb-grid img{border-radius:8px;width:100%;height:auto}
+
+/* ===== SCROLL REVEAL ===== */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:none}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  section{padding:4rem 1.5rem}
+  .hero{padding:6rem 1.5rem 4rem}
+  .chars-grid,.works-grid,.process-list{grid-template-columns:1fr}
+  .featured-inner{grid-template-columns:1fr}
+  .stats-wrap{grid-template-columns:1fr}
+  .contact-actions{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-text">LOADING</div>
+  <div class="loader-sub">AI Manga Studio</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo">AI Manga</div>
+  <ul class="nav-links">
+    <li><a href="#about">Characters</a></li>
+    <li><a href="#works">Works</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <!-- Floating deco -->
+  <span class="deco" style="top:10%;left:6%;animation-delay:0s">🌸</span>
+  <span class="deco" style="top:18%;right:8%;animation-delay:-1s">⭐</span>
+  <span class="deco" style="bottom:22%;left:10%;animation-delay:-3s">🍡</span>
+  <span class="deco" style="bottom:15%;right:12%;animation-delay:-2s">🌷</span>
+  <span class="deco" style="top:40%;left:3%;animation-delay:-5s">✨</span>
+  <span class="deco" style="top:35%;right:4%;animation-delay:-4s">🌸</span>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">AI-Generated Manga · 2024–2025</p>
+    <h1 class="hero-title">
+      <span>AI で描く</span>
+      <span class="accent">漫画の世界</span>
+    </h1>
+    <p class="hero-body">たまご君・パティシエちゃんが繰り広げる、季節の料理と冒険。Kindle出版からX投稿まで、AIで一から作り上げた温かい漫画シリーズ。</p>
+    <div>
+      <a href="#works" class="btn-pill">作品を見る</a>
+      <a href="#contact" class="btn-pill btn-pill--outline">お問い合わせ</a>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item"><span>✦</span>AI MANGA</span>
+    <span class="marquee-item"><span>✦</span>KINDLE PUBLISHED</span>
+    <span class="marquee-item"><span>✦</span>たまご君</span>
+    <span class="marquee-item"><span>✦</span>パティシエちゃん</span>
+    <span class="marquee-item"><span>✦</span>GEMINI IMAGEN</span>
+    <span class="marquee-item"><span>✦</span>CLAUDE AI</span>
+    <span class="marquee-item"><span>✦</span>季節の物語</span>
+    <span class="marquee-item"><span>✦</span>AI MANGA</span>
+    <span class="marquee-item"><span>✦</span>KINDLE PUBLISHED</span>
+    <span class="marquee-item"><span>✦</span>たまご君</span>
+    <span class="marquee-item"><span>✦</span>パティシエちゃん</span>
+    <span class="marquee-item"><span>✦</span>GEMINI IMAGEN</span>
+    <span class="marquee-item"><span>✦</span>CLAUDE AI</span>
+    <span class="marquee-item"><span>✦</span>季節の物語</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<section>
+  <div class="container">
+    <div class="stats-wrap reveal">
+      <div class="stat">
+        <div class="stat-num">2<span class="stat-unit">冊</span></div>
+        <div class="stat-label">Kindle 出版</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100<span class="stat-unit">+</span></div>
+        <div class="stat-label">生成ページ数</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3<span class="stat-unit">話</span></div>
+        <div class="stat-label">シリーズ展開中</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Characters -->
+<section id="about">
+  <div class="container">
+    <p class="section-label reveal">Characters</p>
+    <h2 class="section-title reveal">登場キャラクター</h2>
+    <p class="section-body reveal">季節ごとの料理や行事を一緒に体験する、物語の主役たち。</p>
+    <div class="chars-grid">
+      <div class="char-card reveal reveal-delay-1">
+        <div class="char-img"><img src="images/chars/pakkun.png" alt="ぱっくん"></div>
+        <h3 class="char-name">ぱっくん</h3>
+        <p class="char-desc">まるくて黄色い好奇心旺盛な子。知らないことはなんでも「なんで？」と聞く。食べることが大好き。</p>
+      </div>
+      <div class="char-card reveal reveal-delay-2">
+        <div class="char-img"><img src="images/chars/kiichan.png" alt="きぃちゃん"></div>
+        <h3 class="char-name">きぃちゃん</h3>
+        <p class="char-desc">ぱっくんのそっくりな相棒。いつも一緒に行動して、2人でわいわい騒ぐのが大好き。</p>
+      </div>
+      <div class="char-card reveal reveal-delay-3">
+        <div class="char-img" style="object-position:center center"><img src="images/chars/patissiere.png" alt="パティシエちゃん" style="object-position:center 20%"></div>
+        <h3 class="char-name">パティシエちゃん</h3>
+        <p class="char-desc">コック帽がトレードマークの女の子。季節のスイーツや料理を優しく教えてくれる頼れる存在。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Works -->
+<section id="works">
+  <div class="container">
+    <p class="section-label reveal">Works</p>
+    <h2 class="section-title reveal">作品シリーズ</h2>
+    <p class="section-body reveal">季節の行事と料理をテーマに、子どもたちが楽しく学べる漫画シリーズ。</p>
+    <div class="works-grid">
+
+      <div class="work-card reveal reveal-delay-1" onclick="openLightbox('winter')">
+        <div class="work-thumb">
+          <img src="images/winter/1-1.jpg" alt="雪あそびと冬のきせつ">
+          <span class="work-badge">Kindle Vol.1</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">Season · Winter</p>
+          <h3 class="work-title">雪あそびと冬のきせつ</h3>
+          <p class="work-desc">雪だるま、滑り台、オラフの真似っこ——たまご君たちの冬の冒険が全10話。</p>
+          <div class="work-tags">
+            <span class="tag">Kindle出版</span>
+            <span class="tag">雪遊び</span>
+            <span class="tag">クリスマス</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="work-card reveal reveal-delay-2" onclick="openLightbox('events')">
+        <div class="work-thumb">
+          <img src="images/events/新節分１.jpg" alt="季節の行事とおいしいもの">
+          <span class="work-badge">Kindle Vol.2</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">Season · Events</p>
+          <h3 class="work-title">季節の行事とおいしいもの</h3>
+          <p class="work-desc">節分・バレンタイン・ホワイトデー・誕生日・猫の日——年中行事を料理と一緒に。</p>
+          <div class="work-tags">
+            <span class="tag">Kindle出版</span>
+            <span class="tag">節分</span>
+            <span class="tag">バレンタイン</span>
+            <span class="tag">誕生日</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="work-card reveal reveal-delay-3" onclick="openLightbox('sakura')">
+        <div class="work-thumb">
+          <img src="images/sakura/1.png" alt="お花見と桜スイーツ">
+          <span class="work-badge">X投稿</span>
+        </div>
+        <div class="work-body">
+          <p class="work-label">Season · Spring</p>
+          <h3 class="work-title">お花見と桜スイーツ</h3>
+          <p class="work-desc">お花見ピクニック→桜の葉の塩漬けの秘密→桜ミルクプリン作り。春の全8話。</p>
+          <div class="work-tags">
+            <span class="tag">X投稿</span>
+            <span class="tag">桜</span>
+            <span class="tag">お花見</span>
+            <span class="tag">スイーツ</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Featured -->
+<section style="background:var(--pink-lt)">
+  <div class="container">
+    <div class="featured-inner">
+      <div>
+        <p class="section-label reveal">Featured</p>
+        <h2 class="section-title reveal">桜ミルクプリンを<br>一緒に作ろう</h2>
+        <blockquote class="featured-quote reveal">「この葉っぱ、食べてもいいの？<br>それとも飾りのドレス？」</blockquote>
+        <p class="section-body reveal">たまご君の素朴な疑問から始まるお菓子の科学。桜の塩漬けからゼラチンの不思議まで、パティシエちゃんが優しく教えてくれる全8ページ。</p>
+        <a href="#works" class="btn-pill" style="margin-top:2rem;display:inline-block">作品を見る</a>
+      </div>
+      <div class="featured-img reveal" style="padding:0;overflow:hidden">
+        <img src="images/sakura/3.png" alt="桜ミルクプリン" style="width:100%;height:100%;object-fit:cover">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Process -->
+<section id="process">
+  <div class="container">
+    <p class="section-label reveal">Process</p>
+    <h2 class="section-title reveal" style="color:var(--white)">AIで漫画を<br>作る流れ</h2>
+    <div class="process-list">
+      <div class="process-item reveal reveal-delay-1">
+        <div class="process-num">01</div>
+        <h3 class="process-name">ストーリー設計</h3>
+        <p class="process-desc">季節のテーマと学びたいことを決め、6コマ構成でセリフを設計。Claude との対話でアイデアを形にする。</p>
+      </div>
+      <div class="process-item reveal reveal-delay-2">
+        <div class="process-num">02</div>
+        <h3 class="process-name">プロンプト生成</h3>
+        <p class="process-desc">キャラクターの一貫性を保ちながら、コマごとのGemini Imagenプロンプトを生成。表情・構図・背景を細かく指定。</p>
+      </div>
+      <div class="process-item reveal reveal-delay-3">
+        <div class="process-num">03</div>
+        <h3 class="process-name">画像生成・選定</h3>
+        <p class="process-desc">Gemini Imagenでイラストを生成。世界観に合う一枚を選定し、キャラクターのぶれを修正する。</p>
+      </div>
+      <div class="process-item reveal" style="transition-delay:.4s">
+        <div class="process-num">04</div>
+        <h3 class="process-name">テキスト合成・公開</h3>
+        <p class="process-desc">Canvaでセリフ・擬音語・吹き出しを追加。X投稿からKindle電子書籍化まで一気通貫。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="container">
+    <p class="section-label reveal">Contact</p>
+    <h2 class="section-title reveal">一緒に作ろう</h2>
+    <p class="section-body reveal">コラボのご依頼・制作についてのご質問など、お気軽にどうぞ。</p>
+    <div class="contact-actions reveal">
+      <a href="https://x.com" class="btn-pill">X でメッセージ</a>
+      <a href="mailto:021512miki@gmail.com" class="btn-pill btn-pill--outline">メールを送る</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <span class="f-logo">AI Manga Studio</span>
+  <span>© 2025 · Claude × Gemini Imagen</span>
+</footer>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lb-close" onclick="closeLightbox()">×</button>
+  <div class="lb-inner" id="lb-inner"></div>
+</div>
+
+<script>
+// Loader
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 2000);
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Lightbox
+const series = {
+  winter: {
+    title: '⛄ 雪あそびと冬のきせつ — Kindle Vol.1',
+    pages: [
+      'images/winter/1-1.jpg',
+      'images/winter/1-2.jpg',
+      'images/winter/1-3.jpg',
+      'images/winter/1-4.jpg',
+      'images/winter/1-5.jpg',
+      'images/winter/1-6.jpg',
+      'images/winter/雪だるま.jpg',
+      'images/winter/滑り台.jpg',
+    ]
+  },
+  events: {
+    title: '🎂 季節の行事とおいしいもの — Kindle Vol.2',
+    pages: [
+      'images/events/新節分１.jpg',
+      'images/events/新節分２.jpg',
+      'images/events/バレンタイン.jpg',
+      'images/events/ハッピーバレンタイン.jpg',
+      'images/events/チョコレート.jpg',
+      'images/events/誕生日.jpg',
+      'images/events/誕生日２.jpg',
+      'images/events/もうすぐ猫の日.jpg',
+    ]
+  },
+  sakura: {
+    title: '🌸 お花見と桜スイーツ — X投稿シリーズ',
+    pages: [
+      'images/sakura/1.png',
+      'images/sakura/2.png',
+      'images/sakura/3.png',
+      'images/sakura/4.png',
+      'images/sakura/5.png',
+      'images/sakura/6.png',
+      'images/sakura/7.png',
+      'images/sakura/8.png',
+    ]
+  }
+};
+
+function openLightbox(key) {
+  const s = series[key];
+  document.getElementById('lb-inner').innerHTML = `
+    <h2 class="lb-title">${s.title}</h2>
+    <div class="lb-grid">
+      ${s.pages.map(p=>`<img src="${p}" alt="" onerror="this.parentNode.removeChild(this)">`).join('')}
+    </div>`;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(e) {
+  if (!e || e.target === document.getElementById('lightbox') || e.target.classList.contains('lb-close')) {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox({target:document.getElementById('lightbox')}); });
+</script>
+</body>
+</html>
